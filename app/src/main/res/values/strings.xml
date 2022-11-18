@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">QCM</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="title_frequency">Frequency</string>
+    <string name="title_temperature">Temp</string>
+    <string name="title_imaging">FL Imaging</string>
+    <string name="title_database">Database</string>
+</resources>

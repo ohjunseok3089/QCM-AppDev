@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_home"
+        android:icon="@drawable/ic_home"
+        android:title="@string/title_home" />
+
+    <item
+        android:id="@+id/navigation_frequency"
+        android:icon="@drawable/ic_frequency"
+        android:title="@string/title_frequency" />
+
+    <item
+        android:id="@+id/navigation_temperature"
+        android:icon="@drawable/ic_temperature"
+        android:title="@string/title_temperature" />
+
+    <item
+        android:id="@+id/navigation_imaging"
+        android:icon="@drawable/ic_imaging"
+        android:title="@string/title_imaging" />
+
+    <item
+        android:id="@+id/navigation_database"
+        android:icon="@drawable/ic_database"
+        android:title="@string/title_database" />
+
+</menu>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_home">
+
+    <fragment
+        android:id="@+id/navigation_home"
+        android:name="com.example.qcm.ui.home.HomeFragment"
+        android:label="@string/title_home"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/navigation_frequency"
+        android:name="com.example.qcm.ui.frequency.FrequencyFragment"
+        android:label="@string/title_frequency"
+        tools:layout="@layout/fragment_frequency" />
+
+    <fragment
+        android:id="@+id/navigation_temperature"
+        android:name="com.example.qcm.ui.temperature.TemperatureFragment"
+        android:label="@string/title_temperature"
+        tools:layout="@layout/fragment_temperature" />
+
+    <fragment
+        android:id="@+id/navigation_imaging"
+        android:name="com.example.qcm.ui.imaging.ImagingFragment"
+        android:label="@string/title_imaging"
+        tools:layout="@layout/fragment_imaging" />
+
+    <fragment
+        android:id="@+id/navigation_database"
+        android:name="com.example.qcm.ui.database.DatabaseFragment"
+        android:label="@string/title_database"
+        tools:layout="@layout/fragment_database" />
+
+</navigation>
