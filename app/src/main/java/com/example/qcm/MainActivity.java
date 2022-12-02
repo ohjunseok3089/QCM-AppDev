@@ -57,20 +57,36 @@ public class MainActivity extends AppCompatActivity {
     private boolean onBT = false;                       // To check is for bluetooth
     public ProgressDialog asyncDialog;
     public TextView tvBT;
+    public TextView rdata;
 
     int duration = Toast.LENGTH_LONG;                   // for showToast(), Toast Length
     String uid = "98:D3:41:F6:8D:DE";                   // HC-05 uid
     static final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
+
     @SuppressLint("MissingPermission") // permission must be checked before the call of the function!
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        rdata = (TextView) findViewById(R.id.receive_data);
+        rdata.setText("This is demo textView for received data");
+        BottomNavigationView navView = findViewById(R.id.nav_view);
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.navigation_home, R.id.navigation_frequency, R.id.navigation_temperature, R.id.navigation_imaging, R.id.navigation_database)
+                .build();
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
+        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        NavigationUI.setupWithNavController(binding.navView, navController);
 
         String[] permission_list = {
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION
         };
+
         ActivityCompat.requestPermissions(MainActivity.this, permission_list, 1);
 
         // Bluetooth connection
@@ -79,12 +95,14 @@ public class MainActivity extends AppCompatActivity {
 
         bluetoothDevice = bluetoothAdapter.getRemoteDevice(uid);
         System.out.println(bluetoothDevice.getName());
+        Toast.makeText(getApplicationContext(), bluetoothDevice.getName() + " 연결 완료!", Toast.LENGTH_SHORT).show();
         int cntTry = 0;
         do {
             try {
-                bluetoothSocket = bluetoothDevice.createInsecureRfcommSocketToServiceRecord(uuid);
+                bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(uuid);
                 System.out.println(bluetoothSocket);
                 bluetoothSocket.connect();
+//                deviceName.setText(bluetoothDevice.getName());
                 System.out.println(bluetoothSocket.isConnected());
             } catch (IOException e) {
                 e.printStackTrace();
@@ -95,30 +113,24 @@ public class MainActivity extends AppCompatActivity {
         try {
             outputStream = bluetoothSocket.getOutputStream();
             inputStream = bluetoothSocket.getInputStream();
-//            receiveData();
+//            byte[] bytes = new byte[1024];
+//            int bytesRead = inputStream.read(bytes);
+            receiveData();
+//            String text = new String(bytes, "ASCII");
+//            text = text.substring(0, bytesRead);
+//            System.out.println(text);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        try {
-            bluetoothSocket.close();
-            System.out.println(bluetoothSocket.isConnected());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            bluetoothSocket.close();
+//            System.out.println(bluetoothSocket.isConnected());
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         // Bluetooth connection DONE
 
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
 
-        BottomNavigationView navView = findViewById(R.id.nav_view);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home, R.id.navigation_frequency, R.id.navigation_temperature, R.id.navigation_imaging, R.id.navigation_database)
-                .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(binding.navView, navController);
     }
 
     @SuppressLint("MissingPermission")
@@ -128,6 +140,8 @@ public class MainActivity extends AppCompatActivity {
 
         bluetoothDevice = bluetoothAdapter.getRemoteDevice(uid);
         System.out.println(bluetoothDevice.getName());
+        Toast.makeText(getApplicationContext(), bluetoothDevice.getName() + " 연결 완료!", Toast.LENGTH_SHORT).show();
+
         int cntTry = 0;
         do {
             try {
@@ -140,11 +154,15 @@ public class MainActivity extends AppCompatActivity {
             }
             cntTry++;
         } while(!bluetoothSocket.isConnected() && cntTry < 3);
-
         try {
             outputStream = bluetoothSocket.getOutputStream();
             inputStream = bluetoothSocket.getInputStream();
-            receiveData();
+            byte[] bytes = new byte[1024];
+            int bytesRead = inputStream.read(bytes);
+//            receiveData();
+            String text = new String(bytes, "ASCII");
+//            text = text.substring(0, bytesRead);
+            System.out.println(text);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -177,12 +195,12 @@ public class MainActivity extends AppCompatActivity {
                                 if (curByte == '\n') {
                                     byte[] encodedBytes = new byte[readBufferPosition];
                                     System.arraycopy(readBuffer, 0, encodedBytes, 0, encodedBytes.length);
-                                    final String text = new String(encodedBytes, "UTF-8");
+                                    final String text = new String(encodedBytes, "ASCII");
                                     readBufferPosition = 0;
                                     handler.post(new Runnable() {
                                         @Override
                                         public void run() {
-                                            System.out.println(text);
+                                            rdata.setText(text);
                                         }
                                     });
                                 } else {
