@@ -32,7 +32,12 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.example.qcm.databinding.ActivityMainBinding;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.Viewport;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -58,12 +63,21 @@ public class MainActivity extends AppCompatActivity {
     public ProgressDialog asyncDialog;
     public TextView tvBT;
     public TextView rdata;
-
+    private Viewport viewport;
     int duration = Toast.LENGTH_LONG;                   // for showToast(), Toast Length
-    String uid = "98:D3:41:F6:8D:DE";                   // HC-05 uid
+//    String uid = "98:D3:41:F6:8D:DE";                   // HC-05 uid
+    String uid = "98:D3:02:96:17:AE";                   // HC-05 uid 2
     static final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
-
+    private int pointsPlotted = 5;
+    private int graphIntervalCounter = 0;
+    LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(new DataPoint[] {
+            new DataPoint(0, 10017756),
+            new DataPoint(1, 10017756),
+            new DataPoint(2, 10017756),
+            new DataPoint(3, 10017756),
+            new DataPoint(4, 10017756)
+    });
     @SuppressLint("MissingPermission") // permission must be checked before the call of the function!
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
         rdata = (TextView) findViewById(R.id.receive_data);
         rdata.setText("This is demo textView for received data");
         BottomNavigationView navView = findViewById(R.id.nav_view);
+
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
@@ -88,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
         };
 
         ActivityCompat.requestPermissions(MainActivity.this, permission_list, 1);
+        GraphView graph = (GraphView) findViewById(R.id.graph);
 
         // Bluetooth connection
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -99,29 +115,36 @@ public class MainActivity extends AppCompatActivity {
         int cntTry = 0;
         do {
             try {
-                bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(uuid);
+                bluetoothSocket = bluetoothDevice.createInsecureRfcommSocketToServiceRecord(uuid);
                 System.out.println(bluetoothSocket);
+                BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
                 bluetoothSocket.connect();
-//                deviceName.setText(bluetoothDevice.getName());
+                Toast.makeText(getApplicationContext(), bluetoothDevice.getName() + " 소켓 연결 완료!", Toast.LENGTH_SHORT).show();
                 System.out.println(bluetoothSocket.isConnected());
+                outputStream = bluetoothSocket.getOutputStream();
+                inputStream = bluetoothSocket.getInputStream();
+                receiveData();
             } catch (IOException e) {
                 e.printStackTrace();
             }
             cntTry++;
         } while (!bluetoothSocket.isConnected() && cntTry < 3);
 
-        try {
-            outputStream = bluetoothSocket.getOutputStream();
-            inputStream = bluetoothSocket.getInputStream();
+//        Dem
+        viewport = graph.getViewport();
+        viewport.setScrollable(true);
+        viewport.setXAxisBoundsManual(true);
+        graph.addSeries(series);
+
+//        try {
 //            byte[] bytes = new byte[1024];
 //            int bytesRead = inputStream.read(bytes);
-            receiveData();
 //            String text = new String(bytes, "ASCII");
 //            text = text.substring(0, bytesRead);
 //            System.out.println(text);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 //        try {
 //            bluetoothSocket.close();
 //            System.out.println(bluetoothSocket.isConnected());
@@ -130,49 +153,6 @@ public class MainActivity extends AppCompatActivity {
 //        }
         // Bluetooth connection DONE
 
-
-    }
-
-    @SuppressLint("MissingPermission")
-    public void connectBluetooth() {
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        System.out.println(bluetoothAdapter);
-
-        bluetoothDevice = bluetoothAdapter.getRemoteDevice(uid);
-        System.out.println(bluetoothDevice.getName());
-        Toast.makeText(getApplicationContext(), bluetoothDevice.getName() + " 연결 완료!", Toast.LENGTH_SHORT).show();
-
-        int cntTry = 0;
-        do {
-            try {
-                bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(uuid);
-                System.out.println(bluetoothSocket);
-                bluetoothSocket.connect();
-                System.out.println(bluetoothSocket.isConnected());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            cntTry++;
-        } while(!bluetoothSocket.isConnected() && cntTry < 3);
-        try {
-            outputStream = bluetoothSocket.getOutputStream();
-            inputStream = bluetoothSocket.getInputStream();
-            byte[] bytes = new byte[1024];
-            int bytesRead = inputStream.read(bytes);
-//            receiveData();
-            String text = new String(bytes, "ASCII");
-//            text = text.substring(0, bytesRead);
-            System.out.println(text);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-//        try {
-//            bluetoothSocket.close();
-//            System.out.println(bluetoothSocket.isConnected());
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
     }
 
     public void receiveData() {
@@ -180,11 +160,17 @@ public class MainActivity extends AppCompatActivity {
 
         readBufferPosition = 0;
         readBuffer = new byte[1024];
+        String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
+        String fileName = "AnalysisData.csv";
+        String filePath = baseDir + File.separator + fileName;
+        File f = new File(filePath);
+//        CSVWriter
 
         workerThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                while(!Thread.currentThread().isInterrupted()) {
+                while (!Thread.currentThread().isInterrupted()) {
+//                for (int j = 0; j <= 10; j++) {
                     try {
                         int byteAvaliable = inputStream.available();
                         if (byteAvaliable > 0) {
@@ -201,6 +187,11 @@ public class MainActivity extends AppCompatActivity {
                                         @Override
                                         public void run() {
                                             rdata.setText(text);
+                                            String[] array = text.split(",");
+                                            series.appendData(new DataPoint(pointsPlotted, Double.parseDouble(array[0])), true, pointsPlotted);
+                                            pointsPlotted++;
+                                            viewport.setMaxX(pointsPlotted);
+                                            viewport.setMinX(pointsPlotted - 50);
                                         }
                                     });
                                 } else {
@@ -220,6 +211,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        workerThread.start();
     }
     public void setRequestEnableBt() {
         Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);

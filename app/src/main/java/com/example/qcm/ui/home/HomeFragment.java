@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.qcm.databinding.FragmentHomeBinding;
+//import com.jjoe64.graphview.GraphView;
 
 public class HomeFragment extends Fragment {
 
@@ -25,6 +26,7 @@ public class HomeFragment extends Fragment {
         View root = binding.getRoot();
 
         final TextView textView = binding.textHome;
+        final TextView bluetoothDeviceName = binding.bluetoothDeviceName;
         homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
