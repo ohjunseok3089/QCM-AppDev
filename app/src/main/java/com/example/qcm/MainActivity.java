@@ -17,7 +17,10 @@ import android.os.Handler;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
 
+import com.example.qcm.ui.frequency.FrequencyFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.activity.result.ActivityResult;
@@ -38,11 +41,14 @@ import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 
@@ -65,18 +71,23 @@ public class MainActivity extends AppCompatActivity {
     public TextView rdata;
     private Viewport viewport;
     int duration = Toast.LENGTH_LONG;                   // for showToast(), Toast Length
-//    String uid = "98:D3:41:F6:8D:DE";                   // HC-05 uid
-    String uid = "98:D3:02:96:17:AE";                   // HC-05 uid 2
+    String uid = "98:D3:41:F6:8D:DE";                   // HC-05 uid
+//    String uid = "98:D3:02:96:17:AE";                   // HC-05 uid 2
     static final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     private int pointsPlotted = 5;
+    private int time_counter = 0;
+
     private int graphIntervalCounter = 0;
+
+    private CSVWriter writer;
+
     LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(new DataPoint[] {
-            new DataPoint(0, 10017756),
-            new DataPoint(1, 10017756),
-            new DataPoint(2, 10017756),
-            new DataPoint(3, 10017756),
-            new DataPoint(4, 10017756)
+            new DataPoint(0, 1007756),
+            new DataPoint(1, 100134),
+            new DataPoint(2, 100176),
+            new DataPoint(3, 1001775),
+            new DataPoint(4, 10016)
     });
     @SuppressLint("MissingPermission") // permission must be checked before the call of the function!
     @Override
@@ -103,9 +114,24 @@ public class MainActivity extends AppCompatActivity {
         };
 
         ActivityCompat.requestPermissions(MainActivity.this, permission_list, 1);
-        GraphView graph = (GraphView) findViewById(R.id.graph);
 
+        GraphView graph = (GraphView) findViewById(R.id.graph);
         // Bluetooth connection
+        connectBluetooth();
+//        Demo
+
+        viewport = graph.getViewport();
+        viewport.setScrollable(true);
+        viewport.setXAxisBoundsManual(true);
+        graph.addSeries(series);
+        viewport.setMaxX(pointsPlotted);
+        viewport.setMinX(pointsPlotted - 1000);
+//        bluetoothActivity.receiveData(rdata, series, pointsPlotted, viewport);
+        // Bluetooth connection DONE
+
+    }
+    @SuppressLint("MissingPermission") // permission must be checked before the call of the function!
+    public void connectBluetooth() {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         System.out.println(bluetoothAdapter);
 
@@ -129,43 +155,23 @@ public class MainActivity extends AppCompatActivity {
             }
             cntTry++;
         } while (!bluetoothSocket.isConnected() && cntTry < 3);
-
-//        Dem
-        viewport = graph.getViewport();
-        viewport.setScrollable(true);
-        viewport.setXAxisBoundsManual(true);
-        graph.addSeries(series);
-
-//        try {
-//            byte[] bytes = new byte[1024];
-//            int bytesRead = inputStream.read(bytes);
-//            String text = new String(bytes, "ASCII");
-//            text = text.substring(0, bytesRead);
-//            System.out.println(text);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        try {
-//            bluetoothSocket.close();
-//            System.out.println(bluetoothSocket.isConnected());
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-        // Bluetooth connection DONE
-
     }
 
-    public void receiveData() {
+    public void receiveData() throws IOException {
         final Handler handler = new Handler();
+//        FrequencyFragment fragment = (FrequencyFragment) getFragmentManager().findFragmentById(R.id.);
 
         readBufferPosition = 0;
         readBuffer = new byte[1024];
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault());
+
         String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
-        String fileName = "AnalysisData.csv";
+        String fileName = "AnalysisData_" + sdf.toString() + ".csv";
         String filePath = baseDir + File.separator + fileName;
         File f = new File(filePath);
-//        CSVWriter
-
+        writer = new CSVWriter(new FileWriter(filePath));
+        String[] header = {"time", "frequency", "temperature"};
+        writer.writeNext(header);
         workerThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -189,7 +195,19 @@ public class MainActivity extends AppCompatActivity {
                                             rdata.setText(text);
                                             String[] array = text.split(",");
                                             series.appendData(new DataPoint(pointsPlotted, Double.parseDouble(array[0])), true, pointsPlotted);
+                                            try {
+                                                writer = new CSVWriter(new FileWriter(filePath, true));
+                                            } catch (IOException e) {
+                                                throw new RuntimeException(e);
+                                            }
+                                            writer.writeNext(new String[]{String.valueOf(time_counter), array[0], array[1]});
+                                            try {
+                                                writer.close();
+                                            } catch (IOException e) {
+                                                throw new RuntimeException(e);
+                                            }
                                             pointsPlotted++;
+                                            time_counter++;
                                             viewport.setMaxX(pointsPlotted);
                                             viewport.setMinX(pointsPlotted - 50);
                                         }

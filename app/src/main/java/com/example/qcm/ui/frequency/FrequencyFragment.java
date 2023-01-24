@@ -10,23 +10,34 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.qcm.MainActivity;
+import com.example.qcm.R;
 import com.example.qcm.databinding.FragmentDashboardBinding;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.Viewport;
 
 public class FrequencyFragment extends Fragment {
 
     private FragmentDashboardBinding binding;
+    private Viewport viewport;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         FrequencyViewModel frequencyViewModel =
                 new ViewModelProvider(this).get(FrequencyViewModel.class);
+        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_frequency, container, false);
+//        binding = FragmentDashboardBinding.inflate(inflater, container, false);
+//        View root = binding.getRoot();
 
-        binding = FragmentDashboardBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
+//        final TextView textView = binding.textDashboard;
+//        frequencyViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+        GraphView graph = (GraphView) rootView.findViewById(R.id.graph);
+        viewport = graph.getViewport();
+        viewport.setScrollable(true);
+        viewport.setXAxisBoundsManual(true);
 
-        final TextView textView = binding.textDashboard;
-        frequencyViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
-        return root;
+//        ((MainActivity)getActivity()).
+        return rootView;
     }
 
     @Override

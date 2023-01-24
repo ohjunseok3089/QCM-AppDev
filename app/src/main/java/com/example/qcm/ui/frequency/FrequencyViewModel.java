@@ -11,6 +11,7 @@ public class FrequencyViewModel extends ViewModel {
     public FrequencyViewModel() {
         mText = new MutableLiveData<>();
         mText.setValue("This is frequency fragment");
+
     }
 
     public LiveData<String> getText() {
