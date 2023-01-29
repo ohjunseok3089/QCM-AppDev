@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -19,6 +20,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
+import java.util.Calendar;
+import java.util.Date;
 
 import com.example.qcm.ui.frequency.FrequencyFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -27,6 +30,7 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.navigation.NavController;
@@ -89,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
             new DataPoint(3, 1001775),
             new DataPoint(4, 10016)
     });
+    @RequiresApi(api = Build.VERSION_CODES.S)
     @SuppressLint("MissingPermission") // permission must be checked before the call of the function!
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,8 +114,14 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(binding.navView, navController);
 
         String[] permission_list = {
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_LOCATION_EXTRA_COMMANDS,
+                Manifest.permission.BLUETOOTH_SCAN,
+                Manifest.permission.BLUETOOTH_CONNECT,
+                Manifest.permission.BLUETOOTH_PRIVILEGED
         };
 
         ActivityCompat.requestPermissions(MainActivity.this, permission_list, 1);
@@ -163,10 +174,12 @@ public class MainActivity extends AppCompatActivity {
 
         readBufferPosition = 0;
         readBuffer = new byte[1024];
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault());
+        Date currentTime = Calendar.getInstance().getTime();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+        String formattedDate = sdf.format(currentTime);
 
         String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
-        String fileName = "AnalysisData_" + sdf.toString() + ".csv";
+        String fileName = "AnalysisData_" + formattedDate + ".csv";
         String filePath = baseDir + File.separator + fileName;
         File f = new File(filePath);
         writer = new CSVWriter(new FileWriter(filePath));
