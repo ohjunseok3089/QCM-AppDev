@@ -19,7 +19,7 @@ import com.jjoe64.graphview.Viewport;
 public class FrequencyFragment extends Fragment {
 
     private FragmentDashboardBinding binding;
-    private Viewport viewport;
+    private Viewport viewportFrequency;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -32,12 +32,15 @@ public class FrequencyFragment extends Fragment {
 //        final TextView textView = binding.textDashboard;
 //        frequencyViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         GraphView graph = (GraphView) rootView.findViewById(R.id.graph);
-        viewport = graph.getViewport();
-        viewport.setScrollable(true);
-        viewport.setXAxisBoundsManual(true);
+        viewportFrequency = graph.getViewport();
+        viewportFrequency.setScrollable(true);
+        viewportFrequency.setXAxisBoundsManual(true);
 
-//        ((MainActivity)getActivity()).
         return rootView;
+    }
+
+    public void setText(String text) {
+        rdata = (TextView) findViewById(R.id.receive_data);
     }
 
     @Override

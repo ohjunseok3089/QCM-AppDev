@@ -178,13 +178,14 @@ public class MainActivity extends AppCompatActivity {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
         String formattedDate = sdf.format(currentTime);
 
-        String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
-        String fileName = "AnalysisData_" + formattedDate + ".csv";
-        String filePath = baseDir + File.separator + fileName;
-        File f = new File(filePath);
-        writer = new CSVWriter(new FileWriter(filePath));
-        String[] header = {"time", "frequency", "temperature"};
-        writer.writeNext(header);
+//        String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
+//        String fileName = "AnalysisData_" + formattedDate + ".csv";
+//        String filePath = baseDir + File.separator + fileName;
+//        File f = new File(filePath);
+//        writer = new CSVWriter(new FileWriter(filePath));
+//        String[] header = {"time", "frequency", "temperature"};
+//        writer.writeNext(header);
+
         workerThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -208,17 +209,17 @@ public class MainActivity extends AppCompatActivity {
                                             rdata.setText(text);
                                             String[] array = text.split(",");
                                             series.appendData(new DataPoint(pointsPlotted, Double.parseDouble(array[0])), true, pointsPlotted);
-                                            try {
-                                                writer = new CSVWriter(new FileWriter(filePath, true));
-                                            } catch (IOException e) {
-                                                throw new RuntimeException(e);
-                                            }
-                                            writer.writeNext(new String[]{String.valueOf(time_counter), array[0], array[1]});
-                                            try {
-                                                writer.close();
-                                            } catch (IOException e) {
-                                                throw new RuntimeException(e);
-                                            }
+//                                            try {
+//                                                writer = new CSVWriter(new FileWriter(filePath, true));
+//                                            } catch (IOException e) {
+//                                                throw new RuntimeException(e);
+//                                            }
+//                                            writer.writeNext(new String[]{String.valueOf(time_counter), array[0], array[1]});
+//                                            try {
+//                                                writer.close();
+//                                            } catch (IOException e) {
+//                                                throw new RuntimeException(e);
+//                                            }
                                             pointsPlotted++;
                                             time_counter++;
                                             viewport.setMaxX(pointsPlotted);
