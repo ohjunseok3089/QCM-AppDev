@@ -25,7 +25,7 @@ import java.util.Date;
 
 import com.example.qcm.ui.frequency.FrequencyFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
+import androidx.fragment.app.FragmentContainerView;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -43,6 +43,8 @@ import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
+
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -137,6 +139,7 @@ public class MainActivity extends AppCompatActivity {
         graph.addSeries(series);
         viewport.setMaxX(pointsPlotted);
         viewport.setMinX(pointsPlotted - 1000);
+//        FrequencyFragment frequencyFragment = (FrequencyFragment) getFragmentManager().findFragmentById(R.id.frequencyFragment);
 //        bluetoothActivity.receiveData(rdata, series, pointsPlotted, viewport);
         // Bluetooth connection DONE
 

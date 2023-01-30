@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentContainerView;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.qcm.MainActivity;
@@ -20,6 +21,7 @@ public class FrequencyFragment extends Fragment {
 
     private FragmentDashboardBinding binding;
     private Viewport viewportFrequency;
+    private TextView rdata;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -32,6 +34,7 @@ public class FrequencyFragment extends Fragment {
 //        final TextView textView = binding.textDashboard;
 //        frequencyViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         GraphView graph = (GraphView) rootView.findViewById(R.id.graph);
+        rdata = (TextView) rootView.findViewById(R.id.receive_data_frequency);
         viewportFrequency = graph.getViewport();
         viewportFrequency.setScrollable(true);
         viewportFrequency.setXAxisBoundsManual(true);
@@ -40,7 +43,7 @@ public class FrequencyFragment extends Fragment {
     }
 
     public void setText(String text) {
-        rdata = (TextView) findViewById(R.id.receive_data);
+        rdata.setText(text);
     }
 
     @Override

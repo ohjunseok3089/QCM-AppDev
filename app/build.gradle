@@ -29,6 +29,7 @@ android {
         viewBinding true
     }
     namespace 'com.example.qcm'
+    buildToolsVersion '33.0.1'
 }
 
 dependencies {
