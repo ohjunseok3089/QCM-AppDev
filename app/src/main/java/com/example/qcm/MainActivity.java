@@ -33,6 +33,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentManager;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -81,20 +82,22 @@ public class MainActivity extends AppCompatActivity {
 //    String uid = "98:D3:02:96:17:AE";                   // HC-05 uid 2
     static final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
-    private int pointsPlotted = 5;
+    private int pointsPlotted = 1;
     private int time_counter = 0;
 
     private int graphIntervalCounter = 0;
+    private double[] freqTemp = {0, 0};
 
     private CSVWriter writer;
+    private FragmentManager fm;
+    private FrequencyFragment frequencyFragment;
+    LineGraphSeries<DataPoint> seriesFrequency = new LineGraphSeries<DataPoint>();
+    LineGraphSeries<DataPoint> seriesTemp = new LineGraphSeries<DataPoint>();
 
-    LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(new DataPoint[] {
-            new DataPoint(0, 1007756),
-            new DataPoint(1, 100134),
-            new DataPoint(2, 100176),
-            new DataPoint(3, 1001775),
-            new DataPoint(4, 10016)
-    });
+    private ArrayList<DataPoint> dataPointSeriesFrequency = new ArrayList<>();
+    private ArrayList<DataPoint> dataPointSeriesTemp = new ArrayList<>();
+
+
     @RequiresApi(api = Build.VERSION_CODES.S)
     @SuppressLint("MissingPermission") // permission must be checked before the call of the function!
     @Override
@@ -132,13 +135,16 @@ public class MainActivity extends AppCompatActivity {
         // Bluetooth connection
         connectBluetooth();
 //        Demo
+//        fm = getSupportFragmentManager();
+//        frequencyFragment = (FrequencyFragment)fm.findFragmentById(R.id.frequencyFragment);
 
-        viewport = graph.getViewport();
-        viewport.setScrollable(true);
-        viewport.setXAxisBoundsManual(true);
-        graph.addSeries(series);
-        viewport.setMaxX(pointsPlotted);
-        viewport.setMinX(pointsPlotted - 1000);
+//        viewport = graph.getViewport();
+//        viewport.setScrollable(true);
+//        viewport.setXAxisBoundsManual(true);
+//        graph.addSeries(seriesFrequency);
+//        graph.addSeries(seriesTemp);
+//        viewport.setMaxX(pointsPlotted);
+//        viewport.setMinX(pointsPlotted - 1000);
 //        FrequencyFragment frequencyFragment = (FrequencyFragment) getFragmentManager().findFragmentById(R.id.frequencyFragment);
 //        bluetoothActivity.receiveData(rdata, series, pointsPlotted, viewport);
         // Bluetooth connection DONE
@@ -210,8 +216,18 @@ public class MainActivity extends AppCompatActivity {
                                         @Override
                                         public void run() {
                                             rdata.setText(text);
+//                                            frequencyFragment.setText(text);
                                             String[] array = text.split(",");
-                                            series.appendData(new DataPoint(pointsPlotted, Double.parseDouble(array[0])), true, pointsPlotted);
+                                            rdata.setText("Frequency: " + array[0] + "Hz | Temperature: " + array[1] + "K");
+                                            DataPoint dataFreq = new DataPoint(pointsPlotted, Double.parseDouble(array[0]));
+                                            DataPoint dataTemp = new DataPoint(pointsPlotted, Double.parseDouble(array[1]));
+                                            seriesFrequency.appendData(dataFreq, true, pointsPlotted);
+                                            seriesTemp.appendData(dataTemp, true, pointsPlotted);
+                                            dataPointSeriesFrequency.add(dataFreq);
+                                            dataPointSeriesTemp.add(dataFreq);
+
+                                            freqTemp[0] = Double.parseDouble(array[0]);
+                                            freqTemp[1] = Double.parseDouble(array[1]);
 //                                            try {
 //                                                writer = new CSVWriter(new FileWriter(filePath, true));
 //                                            } catch (IOException e) {
@@ -225,8 +241,8 @@ public class MainActivity extends AppCompatActivity {
 //                                            }
                                             pointsPlotted++;
                                             time_counter++;
-                                            viewport.setMaxX(pointsPlotted);
-                                            viewport.setMinX(pointsPlotted - 50);
+//                                            viewport.setMaxX(pointsPlotted);
+//                                            viewport.setMinX(pointsPlotted - 50);
                                         }
                                     });
                                 } else {
@@ -247,6 +263,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         workerThread.start();
+    }
+
+    public LineGraphSeries<DataPoint> getSeriesFrequency() {
+        return seriesFrequency;
+    }
+    public LineGraphSeries<DataPoint> getSeriesTemp() {
+        return seriesTemp;
+    }
+    public ArrayList<DataPoint> getDataPointSeriesFrequency() {
+        return dataPointSeriesFrequency;
+    }
+    public ArrayList<DataPoint> getDataPointSeriesTemp() {
+        return dataPointSeriesTemp;
+    }
+    public double[] getFreqTemp() {
+        return freqTemp;
     }
     public void setRequestEnableBt() {
         Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
