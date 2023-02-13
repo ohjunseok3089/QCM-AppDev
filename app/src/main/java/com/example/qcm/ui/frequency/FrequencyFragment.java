@@ -41,7 +41,7 @@ public class FrequencyFragment extends Fragment {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_frequency, container, false);
 
         GraphView graph = (GraphView) rootView.findViewById(R.id.graph);
-        rdata = (TextView) rootView.findViewById(R.id.receive_data_frequency);
+//        rdata = (TextView) rootView.findViewById(R.id.receive_data_frequency);
         viewportFrequency = graph.getViewport();
         viewportFrequency.setScrollable(true);
         viewportFrequency.setXAxisBoundsManual(true);

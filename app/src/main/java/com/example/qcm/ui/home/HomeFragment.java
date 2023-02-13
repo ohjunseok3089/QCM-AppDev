@@ -25,9 +25,9 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textHome;
+//        final TextView textView = binding.textHome;
         final TextView bluetoothDeviceName = binding.bluetoothDeviceName;
-        homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+//        homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
 
