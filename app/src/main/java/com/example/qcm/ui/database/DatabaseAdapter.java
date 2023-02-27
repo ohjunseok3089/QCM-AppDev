@@ -23,9 +23,38 @@ public class DatabaseAdapter extends RecyclerView.Adapter<DatabaseAdapter.ViewHo
 
     public DatabaseAdapter(Context context) {
         List<DataItem> itemList = new ArrayList<>();
-        itemList.add(new DataItem(1, "E.coli_10^9", "2023-02-25", "Positive\nOr 10^9", R.drawable.default_thumbnail));
-        itemList.add(new DataItem(2, "E.coli_10^9", "2023-02-26", "Positive\nOr 10^9", R.drawable.default_thumbnail));
-        itemList.add(new DataItem(3, "E.coli_10^9", "2023-02-27", "Positive\nOr 10^9", R.drawable.default_thumbnail));
+        itemList.add(new DataItem(1, "E.coli_10^9", "2023-02-25", "Positive Or 10^9", R.drawable.default_thumbnail));
+        itemList.add(new DataItem(2, "E.coli_10^9", "2023-02-26", "Positive Or 10^9", R.drawable.default_thumbnail));
+        itemList.add(new DataItem(3, "E.coli_10^9", "2023-02-27", "Positive Or 10^9", R.drawable.default_thumbnail));
+        itemList.add(new DataItem(4, "E.coli_10^9", "2023-02-27", "Positive Or 10^9", R.drawable.default_thumbnail));
+        itemList.add(new DataItem(5, "E.coli_10^9", "2023-02-27", "Positive Or 10^9", R.drawable.default_thumbnail));
+        itemList.add(new DataItem(6, "E.coli_10^9", "2023-02-27", "Positive Or 10^9", R.drawable.default_thumbnail));
+        itemList.add(new DataItem(7, "E.coli_10^9", "2023-02-27", "Positive Or 10^9", R.drawable.default_thumbnail));
+        itemList.add(new DataItem(8, "E.coli_10^9", "2023-02-27", "Positive Or 10^9", R.drawable.default_thumbnail));
+        itemList.add(new DataItem(8, "E.coli_10^9", "2023-02-27", "Positive Or 10^9", R.drawable.default_thumbnail));
+        itemList.add(new DataItem(8, "E.coli_10^9", "2023-02-27", "Positive Or 10^9", R.drawable.default_thumbnail));
+        itemList.add(new DataItem(8, "E.coli_10^9", "2023-02-27", "Positive Or 10^9", R.drawable.default_thumbnail));
+        itemList.add(new DataItem(8, "E.coli_10^9", "2023-02-27", "Positive Or 10^9", R.drawable.default_thumbnail));
+        itemList.add(new DataItem(8, "E.coli_10^9", "2023-02-27", "Positive Or 10^9", R.drawable.default_thumbnail));
+        itemList.add(new DataItem(8, "E.coli_10^9", "2023-02-27", "Positive Or 10^9", R.drawable.default_thumbnail));
+        itemList.add(new DataItem(8, "E.coli_10^9", "2023-02-27", "Positive Or 10^9", R.drawable.default_thumbnail));
+        itemList.add(new DataItem(8, "E.coli_10^9", "2023-02-27", "Positive Or 10^9", R.drawable.default_thumbnail));
+        itemList.add(new DataItem(8, "E.coli_10^9", "2023-02-27", "Positive Or 10^9", R.drawable.default_thumbnail));
+        itemList.add(new DataItem(8, "E.coli_10^9", "2023-02-27", "Positive Or 10^9", R.drawable.default_thumbnail));
+        itemList.add(new DataItem(8, "E.coli_10^9", "2023-02-27", "Positive Or 10^9", R.drawable.default_thumbnail));
+        itemList.add(new DataItem(8, "E.coli_10^9", "2023-02-27", "Positive Or 10^9", R.drawable.default_thumbnail));
+        itemList.add(new DataItem(8, "E.coli_10^9", "2023-02-27", "Positive Or 10^9", R.drawable.default_thumbnail));
+        itemList.add(new DataItem(8, "E.coli_10^9", "2023-02-27", "Positive Or 10^9", R.drawable.default_thumbnail));
+        itemList.add(new DataItem(8, "E.coli_10^9", "2023-02-27", "Positive Or 10^9", R.drawable.default_thumbnail));
+        itemList.add(new DataItem(8, "E.coli_10^9", "2023-02-27", "Positive Or 10^9", R.drawable.default_thumbnail));
+        itemList.add(new DataItem(8, "E.coli_10^9", "2023-02-27", "Positive Or 10^9", R.drawable.default_thumbnail));
+        itemList.add(new DataItem(8, "E.coli_10^9", "2023-02-27", "Positive Or 10^9", R.drawable.default_thumbnail));
+        itemList.add(new DataItem(8, "E.coli_10^9", "2023-02-27", "Positive Or 10^9", R.drawable.default_thumbnail));
+        itemList.add(new DataItem(8, "E.coli_10^9", "2023-02-27", "Positive Or 10^9", R.drawable.default_thumbnail));
+        itemList.add(new DataItem(8, "E.coli_10^9", "2023-02-27", "Positive Or 10^9", R.drawable.default_thumbnail));
+        itemList.add(new DataItem(8, "E.coli_10^9", "2023-02-27", "Positive Or 10^9", R.drawable.default_thumbnail));
+        itemList.add(new DataItem(8, "E.coli_10^9", "2023-02-27", "Positive Or 10^9", R.drawable.default_thumbnail));
+
         mContext = context;
         mItems = itemList;  // your implementation to retrieve the list of items to display
     }
