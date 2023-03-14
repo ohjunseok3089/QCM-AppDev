@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -39,7 +40,7 @@ public class TemperatureFragment extends Fragment {
         receiveDataTextView.setVisibility(View.VISIBLE);
 
         boolean isBluetoothConnected = ((MainActivity) getActivity()).checkBluetooth();
-        if (!isBluetoothConnected) {
+        if (isBluetoothConnected) {
             // If it's not connected, then alert that you have to connect it to bluetooth.
             AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
             builder.setTitle("Bluetooth is not connected.");
@@ -69,7 +70,26 @@ public class TemperatureFragment extends Fragment {
         graph.getGridLabelRenderer().setVerticalAxisTitle("Temperature (K)");
         graph.getGridLabelRenderer().setHorizontalAxisTitle("Time (s)");
         graph.setTitle("Temperature (K) / Time (s)");
+        series.setDrawDataPoints(true);
         viewportTemperature.setMinX(-100);
+
+        // Display on and off button
+        Button display_button = rootView.findViewById(R.id.display_button_temp);
+        display_button.setOnClickListener(new View.OnClickListener() {
+            TextView messageText = rootView.findViewById(R.id.display_text_temp);
+            @Override
+            public void onClick(View view) {
+                if (graph.getVisibility() == View.VISIBLE) {
+                    graph.setVisibility(View.INVISIBLE);
+                    display_button.setText("display on");
+                    messageText.setText("Please click the 'Display On' button.");
+                } else {
+                    graph.setVisibility(View.VISIBLE);
+                    display_button.setText("display off");
+                    messageText.setText("");
+                }
+            }
+        });
         return rootView;
     }
 

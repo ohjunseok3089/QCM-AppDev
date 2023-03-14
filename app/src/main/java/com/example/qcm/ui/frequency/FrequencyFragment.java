@@ -2,11 +2,13 @@ package com.example.qcm.ui.frequency;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -46,7 +48,7 @@ public class FrequencyFragment extends Fragment {
         receiveDataTextView.setVisibility(View.VISIBLE);
 
         boolean isBluetoothConnected = ((MainActivity) getActivity()).checkBluetooth();
-        if (!isBluetoothConnected) {
+        if (isBluetoothConnected) {
             // If it's not connected, then alert that you have to connect it to bluetooth.
             AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
             builder.setTitle("Bluetooth is not connected.");
@@ -77,7 +79,27 @@ public class FrequencyFragment extends Fragment {
         graph.getGridLabelRenderer().setVerticalAxisTitle("Frequency (Hz)");
         graph.getGridLabelRenderer().setHorizontalAxisTitle("Time (s)");
         graph.setTitle("Frequency (Hz) / Time (s)");
+        series.setDrawDataPoints(true);
         viewportFrequency.setMinX(-100);
+
+        // Display on and off button
+        Button display_button = rootView.findViewById(R.id.display_button);
+        display_button.setOnClickListener(new View.OnClickListener() {
+            TextView messageText = rootView.findViewById(R.id.display_text);
+            @Override
+            public void onClick(View view) {
+                if (graph.getVisibility() == View.VISIBLE) {
+                    graph.setVisibility(View.INVISIBLE);
+                    display_button.setText("display on");
+                    messageText.setText("Please click the 'Display On' button.");
+                } else {
+                    graph.setVisibility(View.VISIBLE);
+                    display_button.setText("display off");
+                    messageText.setText("");
+                }
+            }
+        });
+
         return rootView;
     }
 
