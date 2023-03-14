@@ -1,6 +1,7 @@
 package com.example.qcm.ui.frequency;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -39,6 +41,27 @@ public class FrequencyFragment extends Fragment {
         FrequencyViewModel frequencyViewModel =
                 new ViewModelProvider(this).get(FrequencyViewModel.class);
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_frequency, container, false);
+
+        TextView receiveDataTextView = getActivity().findViewById(R.id.receive_data);
+        receiveDataTextView.setVisibility(View.VISIBLE);
+
+        boolean isBluetoothConnected = ((MainActivity) getActivity()).checkBluetooth();
+        if (!isBluetoothConnected) {
+            // If it's not connected, then alert that you have to connect it to bluetooth.
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+            builder.setTitle("Bluetooth is not connected.");
+            builder.setMessage("Please go back to home screen and make sure the app is connected to QCM");
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            builder.show();
+
+            // Bluetooth is not connected, go back to previous fragment/screen
+            getActivity().onBackPressed();
+        }
 
         GraphView graph = (GraphView) rootView.findViewById(R.id.graph);
 //        rdata = (TextView) rootView.findViewById(R.id.receive_data_frequency);

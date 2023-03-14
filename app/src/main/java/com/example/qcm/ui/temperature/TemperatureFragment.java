@@ -1,5 +1,6 @@
 package com.example.qcm.ui.temperature;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -32,6 +34,28 @@ public class TemperatureFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_temperature, container, false);
+
+        TextView receiveDataTextView = getActivity().findViewById(R.id.receive_data);
+        receiveDataTextView.setVisibility(View.VISIBLE);
+
+        boolean isBluetoothConnected = ((MainActivity) getActivity()).checkBluetooth();
+        if (!isBluetoothConnected) {
+            // If it's not connected, then alert that you have to connect it to bluetooth.
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+            builder.setTitle("Bluetooth is not connected.");
+            builder.setMessage("Please go back to home screen and make sure the app is connected to QCM");
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            builder.show();
+
+            // Bluetooth is not connected, go back to previous fragment/screen
+            getActivity().onBackPressed();
+        }
+
         GraphView graph = (GraphView) rootView.findViewById(R.id.graph_temp);
 
         viewportTemperature = graph.getViewport();

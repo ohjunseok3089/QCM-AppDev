@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         rdata = (TextView) findViewById(R.id.receive_data);
-        rdata.setText("This is demo textView for received data");
+        rdata.setText("Please connect to Bluetooth module to received data");
         BottomNavigationView navView = findViewById(R.id.nav_view);
 
         // Passing each menu ID as a set of Ids because each
@@ -163,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
 
         bluetoothDevice = bluetoothAdapter.getRemoteDevice(uid);
         System.out.println(bluetoothDevice.getName());
-        Toast.makeText(getApplicationContext(), bluetoothDevice.getName() + " 연결 완료!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), bluetoothDevice.getName() + " bluetooth connection complete!", Toast.LENGTH_SHORT).show();
         int cntTry = 0;
         do {
             try {
@@ -171,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println(bluetoothSocket);
                 BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
                 bluetoothSocket.connect();
-                Toast.makeText(getApplicationContext(), bluetoothDevice.getName() + " 소켓 연결 완료!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), bluetoothDevice.getName() + " socket connection complete!", Toast.LENGTH_SHORT).show();
                 System.out.println(bluetoothSocket.isConnected());
                 outputStream = bluetoothSocket.getOutputStream();
                 inputStream = bluetoothSocket.getInputStream();
@@ -182,6 +182,23 @@ public class MainActivity extends AppCompatActivity {
             cntTry++;
         } while (!bluetoothSocket.isConnected() && cntTry < 3);
     }
+
+    public void disconnectBluetooth() {
+        try {
+            if (bluetoothSocket != null) {
+                bluetoothSocket.close();
+            }
+            if (outputStream != null) {
+                outputStream.close();
+            }
+            if (inputStream != null) {
+                inputStream.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public void receiveData() throws IOException {
         final Handler handler = new Handler();
@@ -289,6 +306,10 @@ public class MainActivity extends AppCompatActivity {
     public void setRequestEnableBt() {
         Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         bluetoothRequestResult.launch(intent);  //
+    }
+
+    public boolean checkBluetooth() {
+        return this.bluetoothSocket != null && bluetoothSocket.isConnected();
     }
 
     ActivityResultLauncher<Intent> bluetoothRequestResult = registerForActivityResult(
