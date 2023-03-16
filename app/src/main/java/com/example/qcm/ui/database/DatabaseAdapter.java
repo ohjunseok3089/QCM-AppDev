@@ -7,10 +7,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.qcm.MainActivity;
 import com.example.qcm.R;
 
 import java.io.File;
@@ -32,16 +34,20 @@ public class DatabaseAdapter extends RecyclerView.Adapter<DatabaseAdapter.ViewHo
         File file = new File(context.getExternalFilesDir(null), "experiments");
 
         File[] files = file.listFiles();
-        Arrays.sort(files, Comparator.comparingLong(File::lastModified).reversed());
+        if (file != null && files != null) {
+            Arrays.sort(files, Comparator.comparingLong(File::lastModified).reversed());
+        }
 
-
-        if (file != null) {
+        if (file != null && files != null) {
             int data_number = 1;
             for (File excel_file: files) {
                 if (excel_file.isFile() && excel_file.getName().endsWith(".xlsx")) {
                     itemList.add(new DataItem(data_number++, excel_file.getName().replace(".xlsx", ""), new Date(excel_file.lastModified()).toString(), "", R.drawable.default_thumbnail));
                 }
             }
+        } else {
+            Toast toast = Toast.makeText(mContext, "No Experiment exists! Please go back to home screen.", Toast.LENGTH_LONG);
+            toast.show();
         }
 
         mItems = itemList;  // your implementation to retrieve the list of items to display

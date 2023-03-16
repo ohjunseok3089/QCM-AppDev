@@ -138,6 +138,53 @@ public class MainActivity extends AppCompatActivity {
         ActivityCompat.requestPermissions(MainActivity.this, permission_list, 1);
 
         GraphView graph = (GraphView) findViewById(R.id.graph);
+
+        seriesFrequency.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
+        seriesTemp.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
+        dataPointSeriesFrequency.add(new DataPoint(pointsPlotted++, 100));
+        dataPointSeriesTemp.add(new DataPoint(pointsPlotted++, 100));
+        seriesFrequency.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
+        seriesTemp.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
+        dataPointSeriesFrequency.add(new DataPoint(pointsPlotted++, 100));
+        dataPointSeriesTemp.add(new DataPoint(pointsPlotted++, 100));seriesFrequency.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
+        seriesTemp.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
+        dataPointSeriesFrequency.add(new DataPoint(pointsPlotted++, 100));
+        dataPointSeriesTemp.add(new DataPoint(pointsPlotted++, 100));seriesFrequency.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
+        seriesTemp.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
+        dataPointSeriesFrequency.add(new DataPoint(pointsPlotted++, 100));
+        dataPointSeriesTemp.add(new DataPoint(pointsPlotted++, 100));seriesFrequency.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
+        seriesTemp.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
+        dataPointSeriesFrequency.add(new DataPoint(pointsPlotted++, 100));
+        dataPointSeriesTemp.add(new DataPoint(pointsPlotted++, 100));seriesFrequency.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
+        seriesTemp.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
+        dataPointSeriesFrequency.add(new DataPoint(pointsPlotted++, 100));
+        dataPointSeriesTemp.add(new DataPoint(pointsPlotted++, 100));seriesFrequency.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
+        seriesTemp.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
+        dataPointSeriesFrequency.add(new DataPoint(pointsPlotted++, 100));
+        dataPointSeriesTemp.add(new DataPoint(pointsPlotted++, 100));seriesFrequency.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
+        seriesTemp.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
+        dataPointSeriesFrequency.add(new DataPoint(pointsPlotted++, 100));
+        dataPointSeriesTemp.add(new DataPoint(pointsPlotted++, 100));seriesFrequency.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
+        seriesTemp.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
+        dataPointSeriesFrequency.add(new DataPoint(pointsPlotted++, 100));
+        dataPointSeriesTemp.add(new DataPoint(pointsPlotted++, 100));seriesFrequency.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
+        seriesTemp.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
+        dataPointSeriesFrequency.add(new DataPoint(pointsPlotted++, 100));
+        dataPointSeriesTemp.add(new DataPoint(pointsPlotted++, 100));seriesFrequency.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
+        seriesTemp.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
+        dataPointSeriesFrequency.add(new DataPoint(pointsPlotted++, 100));
+        dataPointSeriesTemp.add(new DataPoint(pointsPlotted++, 100));seriesFrequency.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
+        seriesTemp.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
+        dataPointSeriesFrequency.add(new DataPoint(pointsPlotted++, 100));
+        dataPointSeriesTemp.add(new DataPoint(pointsPlotted++, 100));seriesFrequency.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
+        seriesTemp.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
+        dataPointSeriesFrequency.add(new DataPoint(pointsPlotted++, 100));
+        dataPointSeriesTemp.add(new DataPoint(pointsPlotted++, 100));seriesFrequency.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
+        seriesTemp.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
+        dataPointSeriesFrequency.add(new DataPoint(pointsPlotted++, 100));
+        dataPointSeriesTemp.add(new DataPoint(pointsPlotted++, 100));
+
+
         // Bluetooth connection
 //        connectBluetooth();
 //        Demo
@@ -156,6 +203,11 @@ public class MainActivity extends AppCompatActivity {
         // Bluetooth connection DONE
 
     }
+
+    /**
+     * Bluetooth Related Methods START
+     */
+
     @SuppressLint("MissingPermission") // permission must be checked before the call of the function!
     public void connectBluetooth() {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -198,8 +250,13 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+    /**
+     * Bluetooth Related Methods END
+     */
 
-
+    /**
+     * Graph Data Related Methods START
+     */
     public void receiveData() throws IOException {
         final Handler handler = new Handler();
 //        FrequencyFragment fragment = (FrequencyFragment) getFragmentManager().findFragmentById(R.id.);
@@ -303,6 +360,19 @@ public class MainActivity extends AppCompatActivity {
     public double[] getFreqTemp() {
         return freqTemp;
     }
+
+    public void restartFreqCollection(){
+        seriesFrequency = new LineGraphSeries<DataPoint>();
+        dataPointSeriesFrequency = new ArrayList<>();
+    }
+
+    public void restartTempCollection(){
+        seriesTemp = new LineGraphSeries<DataPoint>();
+        dataPointSeriesTemp = new ArrayList<>();
+    }
+    /**
+     * Graph Data Related Methods END
+     */
     public void setRequestEnableBt() {
         Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         bluetoothRequestResult.launch(intent);  //
@@ -439,8 +509,6 @@ public class MainActivity extends AppCompatActivity {
     public Set<BluetoothDevice> getBondedDevices() {
         return bluetoothAdapter.getBondedDevices();
     }
-
-
 
     private void showToast(String msg) {
         Toast.makeText(getApplicationContext(), msg, duration).show();
