@@ -8,29 +8,6 @@
     tools:context=".ui.frequency.FrequencyFragment">
 
 
-
-    <Button
-        android:id="@+id/restart_button"
-        android:layout_width="104dp"
-        android:layout_height="55dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="72dp"
-        android:text="restart"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <Button
-        android:id="@+id/save_button"
-        android:layout_width="104dp"
-        android:layout_height="55dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="72dp"
-        android:text="Save"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/restart_button"
-        app:layout_constraintStart_toEndOf="@+id/display_switch_freq" />
-
     <com.jjoe64.graphview.GraphView
         android:id="@+id/graph"
         android:layout_width="match_parent"
@@ -79,12 +56,24 @@
         android:id="@+id/display_switch_freq"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="72dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginBottom="90dp"
         android:checked="true"
         android:thumb="@drawable/ic_display"
         android:track="@drawable/display_button_track"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <ToggleButton
+        android:id="@+id/freq_toggle_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="48dp"
+        android:layout_marginBottom="90dp"
+        android:textOff=""
+        android:textOn=""
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

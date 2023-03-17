@@ -57,12 +57,12 @@ public class HomeFragment extends Fragment {
                     // The switch is on
                     Toast toast = Toast.makeText(root.getContext(), "Connecting Bluetooth...", Toast.LENGTH_SHORT);
                     toast.show();
-                    ((MainActivity) getActivity()).connectBluetooth();
+//                    ((MainActivity) getActivity()).connectBluetooth();
                 } else {
                     // The switch is off
                     Toast toast = Toast.makeText(root.getContext(), "Disconnecting Bluetooth...", Toast.LENGTH_SHORT);
                     toast.show();
-                    ((MainActivity) getActivity()).disconnectBluetooth();
+//                    ((MainActivity) getActivity()).disconnectBluetooth();
                 }
             }
         });
