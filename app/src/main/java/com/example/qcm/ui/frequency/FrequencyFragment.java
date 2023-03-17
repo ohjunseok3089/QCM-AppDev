@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -89,18 +90,21 @@ public class FrequencyFragment extends Fragment {
         viewportFrequency.setMinX(-100);
 
         // Display on and off button
-        Button display_button = rootView.findViewById(R.id.display_button);
-        display_button.setOnClickListener(new View.OnClickListener() {
+        @SuppressLint("UseSwitchCompatOrMaterialCode")
+        Switch display_switch = rootView.findViewById(R.id.display_switch_freq);
+
+        display_switch.setOnClickListener(new View.OnClickListener() {
             TextView messageText = rootView.findViewById(R.id.display_text);
+
             @Override
             public void onClick(View view) {
                 if (graph.getVisibility() == View.VISIBLE) {
                     graph.setVisibility(View.INVISIBLE);
-                    display_button.setText("display on");
+                    display_switch.setChecked(false);
                     messageText.setText("Please click the 'Display On' button.");
                 } else {
                     graph.setVisibility(View.VISIBLE);
-                    display_button.setText("display off");
+                    display_switch.setChecked(true);
                     messageText.setText("");
                 }
             }
