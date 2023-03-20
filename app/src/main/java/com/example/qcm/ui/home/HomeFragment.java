@@ -93,7 +93,7 @@ public class HomeFragment extends Fragment {
                         String title = inputTitle.getText().toString();
 
                         File file = new File(getContext().getExternalFilesDir("experiments"), title + ".xlsx");
-
+                        ((MainActivity)getActivity()).setCurExcelFile(file);
                         // Check if the file with the given title already exists
                         if (file.exists()) {
                             AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
@@ -142,6 +142,7 @@ public class HomeFragment extends Fragment {
                                     }
                                 });
                                 builder.show();
+                                outputStream.close();
 
 
                             } catch (IOException e) {

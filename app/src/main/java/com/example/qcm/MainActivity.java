@@ -24,6 +24,10 @@ import android.widget.Toast;
 import com.google.android.material.navigation.NavigationBarView;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -51,6 +55,13 @@ import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.w3c.dom.Text;
 
 import java.io.File;
@@ -83,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
     public TextView tvBT;
     public TextView rdata;
     private Viewport viewport;
+    private File curExcel;
     int duration = Toast.LENGTH_LONG;                   // for showToast(), Toast Length
     String uid = "98:D3:41:F6:8D:DE";                   // HC-05 uid
 //    String uid = "98:D3:02:96:17:AE";                   // HC-05 uid 2
@@ -102,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ArrayList<DataPoint> dataPointSeriesFrequency = new ArrayList<>();
     private ArrayList<DataPoint> dataPointSeriesTemp = new ArrayList<>();
+    private Workbook curWorkbook;
 
 
     @RequiresApi(api = Build.VERSION_CODES.S)
@@ -308,6 +321,25 @@ public class MainActivity extends AppCompatActivity {
 
                                             freqTemp[0] = Double.parseDouble(array[0]);
                                             freqTemp[1] = Double.parseDouble(array[1]);
+                                            if (curWorkbook != null){
+                                                try {
+                                                    Sheet sheet = curWorkbook.getSheetAt(0);
+                                                    Row row = sheet.createRow(pointsPlotted);
+                                                    Cell cell1 = row.createCell(0);
+                                                    cell1.setCellValue(pointsPlotted);
+
+                                                    Cell cell2 = row.createCell(1);
+                                                    cell2.setCellValue(dataFreq.toString());
+
+                                                    Cell cell3 = row.createCell(2);
+                                                    cell3.setCellValue(dataTemp.toString());
+
+                                                    FileOutputStream outputStream = new FileOutputStream(curExcel);
+                                                    curWorkbook.write(outputStream);
+                                                } catch (IOException e) {
+                                                    throw new RuntimeException(e);
+                                                }
+                                            }
 //                                            try {
 //                                                writer = new CSVWriter(new FileWriter(filePath, true));
 //                                            } catch (IOException e) {
@@ -361,6 +393,43 @@ public class MainActivity extends AppCompatActivity {
         return freqTemp;
     }
 
+    public void setCurExcelFile(File current){
+        curExcel = current;
+    }
+    public void saveExcelFile() throws IOException {
+        // Create a new workbook
+        Workbook workbook = WorkbookFactory.create(true);
+
+        // Create a new sheet
+        Sheet sheet = workbook.createSheet("Time_Temperature_Frequency");
+
+        Row row1 = sheet.createRow(0);
+
+        Cell cell1 = row1.createCell(0);
+        cell1.setCellValue("Time");
+
+        Cell cell2 = row1.createCell(1);
+        cell2.setCellValue("Temperature");
+
+        Cell cell3 = row1.createCell(2);
+        cell3.setCellValue("Frequency");
+
+        for (int i = 0; i < dataPointSeriesFrequency.size(); i++) {
+            Row row = sheet.createRow(i + 1);
+            cell1 = row.createCell(0);
+            cell1.setCellValue(i + 1);
+
+            cell2 = row.createCell(1);
+            cell2.setCellValue(dataPointSeriesTemp.get(i).toString());
+
+            cell3 = row.createCell(2);
+            cell3.setCellValue(dataPointSeriesFrequency.get(i).toString());
+        }
+        curWorkbook = workbook;
+        FileOutputStream outputStream = new FileOutputStream(curExcel);
+        workbook.write(outputStream);
+
+    }
     public void restartFreqCollection(){
         seriesFrequency = new LineGraphSeries<DataPoint>();
         dataPointSeriesFrequency = new ArrayList<>();

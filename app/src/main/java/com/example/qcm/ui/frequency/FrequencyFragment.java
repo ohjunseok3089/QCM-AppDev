@@ -132,6 +132,21 @@ public class FrequencyFragment extends Fragment {
                     // Change to the restart button design
                     buttonView.setBackgroundResource(R.drawable.restart_button);
                     // For saving method.
+                    AlertDialog.Builder builder = new AlertDialog.Builder(rootView.getContext());
+                    builder.setMessage("Would you like to start saving data points?")
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which){
+                                    try {
+                                        ((MainActivity)getActivity()).saveExcelFile();
+                                    } catch (IOException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                }
+                            }
+                            );
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
 
                 } else {
                     // Change back to the save button design
