@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         rdata = (TextView) findViewById(R.id.receive_data);
-        rdata.setText("Please connect to Bluetooth module to received data");
+        rdata.setText("Please connect to Bluetooth module to receive data");
         BottomNavigationView navView = findViewById(R.id.nav_view);
 
         // Passing each menu ID as a set of Ids because each
