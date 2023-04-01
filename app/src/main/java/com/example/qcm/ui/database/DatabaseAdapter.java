@@ -26,8 +26,12 @@ public class DatabaseAdapter extends RecyclerView.Adapter<DatabaseAdapter.ViewHo
 
     private Context mContext;
     private List<DataItem> mItems;
+    private OnItemClickListener listener;
 
-    public DatabaseAdapter(Context context) {
+
+    public DatabaseAdapter(Context context, OnItemClickListener listener) {
+        this.listener = listener;
+
         mContext = context;
 
         List<DataItem> itemList = new ArrayList<>();
@@ -53,6 +57,10 @@ public class DatabaseAdapter extends RecyclerView.Adapter<DatabaseAdapter.ViewHo
         mItems = itemList;  // your implementation to retrieve the list of items to display
     }
 
+    public interface OnItemClickListener {
+        void onItemClick(DataItem item);
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -74,7 +82,7 @@ public class DatabaseAdapter extends RecyclerView.Adapter<DatabaseAdapter.ViewHo
         return mItems.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView thumbnailImageView;
         public TextView titleTextView;
         public TextView dateTextView;
@@ -86,6 +94,27 @@ public class DatabaseAdapter extends RecyclerView.Adapter<DatabaseAdapter.ViewHo
             titleTextView = itemView.findViewById(R.id.title);
             dateTextView = itemView.findViewById(R.id.date);
             typeTextView = itemView.findViewById(R.id.type);
+
+            // Add an OnClickListener to the itemView
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Get the position of the item clicked
+                    int position = getAdapterPosition();
+
+                    // Make sure the position is valid
+                    if (position != RecyclerView.NO_POSITION) {
+                        // Get the item at the position
+                        DataItem item = mItems.get(position);
+
+                        // Call the onItemClick method of the listener object
+                        if (listener != null) {
+                            listener.onItemClick(item);
+                        }
+                    }
+                }
+            });
         }
+
     }
 }

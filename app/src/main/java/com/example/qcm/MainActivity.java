@@ -21,6 +21,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.qcm.ui.database.DatabaseDetailFragment;
 import com.google.android.material.navigation.NavigationBarView;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
@@ -44,6 +45,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -420,10 +422,10 @@ public class MainActivity extends AppCompatActivity {
             cell1.setCellValue(i + 1);
 
             cell2 = row.createCell(1);
-            cell2.setCellValue(dataPointSeriesTemp.get(i).toString());
+            cell2.setCellValue(dataPointSeriesTemp.get(i).getY());
 
             cell3 = row.createCell(2);
-            cell3.setCellValue(dataPointSeriesFrequency.get(i).toString());
+            cell3.setCellValue(dataPointSeriesFrequency.get(i).getY());
         }
         curWorkbook = workbook;
         FileOutputStream outputStream = new FileOutputStream(curExcel);
@@ -442,6 +444,16 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Graph Data Related Methods END
      */
+
+    /**
+     * Fragment transfer process
+     */
+
+    public void switchFragment(Bundle bundle) {
+        // Currently, it's just for nav_database_detail.
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
+        navController.navigate(R.id.navigation_database_detail, bundle);
+    }
     public void setRequestEnableBt() {
         Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         bluetoothRequestResult.launch(intent);  //
