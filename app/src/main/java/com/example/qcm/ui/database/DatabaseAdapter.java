@@ -26,9 +26,12 @@ public class DatabaseAdapter extends RecyclerView.Adapter<DatabaseAdapter.ViewHo
 
     private Context mContext;
     private List<DataItem> mItems;
+    private OnItemClickListener listener;
 
-    public DatabaseAdapter(Context context) {
+
+    public DatabaseAdapter(Context context, OnItemClickListener listener) {
         mContext = context;
+        this.listener = listener;
 
         List<DataItem> itemList = new ArrayList<>();
         File file = new File(context.getExternalFilesDir(null), "experiments");
@@ -57,6 +60,7 @@ public class DatabaseAdapter extends RecyclerView.Adapter<DatabaseAdapter.ViewHo
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.item_database, parent, false);
+
         return new ViewHolder(view);
     }
 
@@ -74,7 +78,11 @@ public class DatabaseAdapter extends RecyclerView.Adapter<DatabaseAdapter.ViewHo
         return mItems.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public interface OnItemClickListener {
+        void onItemClick(DataItem item);
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView thumbnailImageView;
         public TextView titleTextView;
         public TextView dateTextView;
@@ -82,10 +90,33 @@ public class DatabaseAdapter extends RecyclerView.Adapter<DatabaseAdapter.ViewHo
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+
+            // Find the views in the item layout
             thumbnailImageView = itemView.findViewById(R.id.thumbnail);
             titleTextView = itemView.findViewById(R.id.title);
             dateTextView = itemView.findViewById(R.id.date);
             typeTextView = itemView.findViewById(R.id.type);
+
+            // Add an OnClickListener to the itemView
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Get the position of the item clicked
+                    int position = getAdapterPosition();
+
+                    // Make sure the position is valid
+                    if (position != RecyclerView.NO_POSITION) {
+                        // Get the item at the position
+                        DataItem item = mItems.get(position);
+
+                        // Call the onItemClick method of the listener object
+                        if (listener != null) {
+                            listener.onItemClick(item);
+                        }
+                    }
+                }
+            });
+
         }
     }
 }

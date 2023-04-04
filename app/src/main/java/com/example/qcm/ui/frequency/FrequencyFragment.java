@@ -17,6 +17,7 @@ import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -42,6 +43,7 @@ public class FrequencyFragment extends Fragment {
     private double[] freqTemp;
 
     private LineGraphSeries<DataPoint> series;
+    private GraphView graph;
     private ArrayList<DataPoint> dataPointSeriesFrequency;
 
 
@@ -75,16 +77,15 @@ public class FrequencyFragment extends Fragment {
             getActivity().onBackPressed();
         }
 
-        GraphView graph = (GraphView) rootView.findViewById(R.id.graph);
-//        rdata = (TextView) rootView.findViewById(R.id.receive_data_frequency);
+        graph = (GraphView) rootView.findViewById(R.id.graph);
+
         viewportFrequency = graph.getViewport();
         viewportFrequency.setScrollable(true);
         viewportFrequency.setXAxisBoundsManual(true);
 
         series = ((MainActivity)getActivity()).getSeriesFrequency();
         dataPointSeriesFrequency = ((MainActivity)getActivity()).getDataPointSeriesFrequency();
-        int size = dataPointSeriesFrequency.size();
-        System.out.println(size);
+
         graph.addSeries(series);
         graph.getGridLabelRenderer().setVerticalAxisTitle("Frequency (Hz)");
         graph.getGridLabelRenderer().setHorizontalAxisTitle("Time (s)");
@@ -129,67 +130,63 @@ public class FrequencyFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    // Change to the restart button design
                     buttonView.setBackgroundResource(R.drawable.restart_button);
-                    // For saving method.
-                    AlertDialog.Builder builder = new AlertDialog.Builder(rootView.getContext());
-                    builder.setMessage("Would you like to start saving data points?")
-                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which){
-                                    try {
-                                        ((MainActivity)getActivity()).saveExcelFile();
-                                    } catch (IOException e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                }
-                            }
-                            );
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-
                 } else {
-                    // Change back to the save button design
                     buttonView.setBackgroundResource(R.drawable.save_button);
+                }
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(rootView.getContext());
-                    builder.setMessage("If you restart the experiment, you cannot revert the changes. Are you going to proceed?")
-                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // Run your method here when the user clicks "Yes"
-                                    ((MainActivity) requireActivity()).restartFreqCollection();
-                                    GraphView graph = (GraphView) rootView.findViewById(R.id.graph);
-//        rdata = (TextView) rootView.findViewById(R.id.receive_data_frequency);
-                                    viewportFrequency = graph.getViewport();
-                                    viewportFrequency.setScrollable(true);
-                                    viewportFrequency.setXAxisBoundsManual(true);
+                if (toggleButton.isPressed()){
+                    if (isChecked) {
+                        buttonView.setBackgroundResource(R.drawable.restart_button);
+                        // Change to the restart button design
+                        // For saving method.
+                        AlertDialog.Builder builder = new AlertDialog.Builder(rootView.getContext());
+                        builder.setMessage("Would you like to start saving data points?")
+                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which){
+                                        try {
+                                            ((MainActivity)getActivity()).saveExcelFile();
+                                        } catch (IOException e) {
+                                            throw new RuntimeException(e);
+                                        }
+                                    }
+                                })
+                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // Do nothing when the user clicks "No"
+                                        buttonView.setBackgroundResource(R.drawable.save_button);
 
-                                    series = ((MainActivity)getActivity()).getSeriesFrequency();
-                                    dataPointSeriesFrequency = ((MainActivity)getActivity()).getDataPointSeriesFrequency();
-                                    int size = dataPointSeriesFrequency.size();
-                                    System.out.println(size);
-                                    graph.addSeries(series);
-                                    graph.getGridLabelRenderer().setVerticalAxisTitle("Frequency (Hz)");
-                                    graph.getGridLabelRenderer().setHorizontalAxisTitle("Time (s)");
-                                    graph.setTitle("Frequency (Hz) / Time (s)");
-                                    series.setDrawDataPoints(true);
-                                    viewportFrequency.setMinX(-100);
-                                }
-                            })
-                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // Do nothing when the user clicks "No"
-                                }
-                            });
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-
+                                    }
+                                });
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
+                    } else {
+                        // Change back to the save button design
+                        AlertDialog.Builder builder = new AlertDialog.Builder(rootView.getContext());
+                        builder.setMessage("If you restart the experiment, you cannot revert the changes. Are you going to proceed?")
+                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // Run your method here when the user clicks "Yes"
+                                        ((MainActivity) requireActivity()).restartFreqCollection();
+                                        graph.removeAllSeries();
+                                        buttonView.setBackgroundResource(R.drawable.save_button);
+                                    }
+                                })
+                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // Do nothing when the user clicks "No"
+                                    }
+                                });
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
+                    }
                 }
             }
         });
-
         return rootView;
     }
 

@@ -8,6 +8,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,10 +34,24 @@ public class DatabaseFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_database, container, false);
         RecyclerView recyclerView = rootView.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        DatabaseAdapter adapter = new DatabaseAdapter(getContext());
+
+        DatabaseAdapter adapter = new DatabaseAdapter(getContext(), new DatabaseAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(DataItem item) {
+                String fileName = item.getTitle() + ".xlsx"; // get the selected Excel file name
+                Bundle bundle = new Bundle();
+                bundle.putString("fileName", fileName);
+
+                DatabaseDetail databaseDetail = new DatabaseDetail();
+                databaseDetail.setArguments(bundle);
+
+                FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.recycler_view, databaseDetail);
+                transaction.addToBackStack(null);
+                transaction.commit();
+            }
+        });
         recyclerView.setAdapter(adapter);
-
-
 
         return rootView;
     }
