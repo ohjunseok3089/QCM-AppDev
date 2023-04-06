@@ -10,6 +10,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -56,15 +58,12 @@ public class DatabaseFragment extends Fragment {
                 } else {
                     Toast.makeText(getContext(), "File not found: " + fileName, Toast.LENGTH_SHORT).show();
                 }
-
             }
         });
         recyclerView.setAdapter(adapter);
 
         return rootView;
     }
-
-
 
     @Override
     public void onDestroyView() {

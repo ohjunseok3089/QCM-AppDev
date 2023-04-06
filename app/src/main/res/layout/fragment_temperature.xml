@@ -2,39 +2,33 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rt_freqency"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.temperature.TemperatureFragment">
 
-    <Button
-        android:id="@+id/display_button_temp"
-        android:layout_width="104dp"
-        android:layout_height="55dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="72dp"
-        android:text="Display OFF"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/restart_button_temp"
-        android:layout_width="104dp"
-        android:layout_height="55dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="72dp"
-        android:text="restart"
+    <ToggleButton
+        android:id="@+id/temp_toggle_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="48dp"
+        android:layout_marginBottom="90dp"
+        android:textOff=""
+        android:textOn=""
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <Button
-        android:id="@+id/save_button_temp"
-        android:layout_width="104dp"
-        android:layout_height="55dp"
-        android:layout_marginBottom="72dp"
-        android:text="Save"
+    <Switch
+        android:id="@+id/display_switch_temp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="48dp"
+        android:layout_marginBottom="90dp"
+        android:checked="true"
+        android:thumb="@drawable/ic_display"
+        android:track="@drawable/display_button_track"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/restart_button_temp"
-        app:layout_constraintStart_toEndOf="@+id/display_button_temp" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <com.jjoe64.graphview.GraphView
         android:id="@+id/graph_temp"
@@ -59,5 +53,25 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/rt_freqency_temp"
+        android:layout_width="359dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="112dp"
+        android:text="Real-time Frequency"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/graph_temp" />
+
+    <TextView
+        android:id="@+id/rt_temp"
+        android:layout_width="360dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="20dp"
+        android:text="Real-time Temperature"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rt_freqency_temp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
