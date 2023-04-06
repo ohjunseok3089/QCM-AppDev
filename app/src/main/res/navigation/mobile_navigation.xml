@@ -35,4 +35,9 @@
         android:label="@string/title_database"
         tools:layout="@layout/fragment_database" />
 
+    <fragment
+        android:id="@+id/navigation_database_detail"
+        android:name="com.example.qcm.ui.database.DatabaseDetailFragment"
+        android:label="Database Detail"
+        />
 </navigation>

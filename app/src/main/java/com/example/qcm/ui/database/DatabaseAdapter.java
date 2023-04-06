@@ -28,7 +28,6 @@ public class DatabaseAdapter extends RecyclerView.Adapter<DatabaseAdapter.ViewHo
     private List<DataItem> mItems;
     private OnItemClickListener listener;
 
-
     public DatabaseAdapter(Context context, OnItemClickListener listener) {
         mContext = context;
         this.listener = listener;
@@ -54,6 +53,10 @@ public class DatabaseAdapter extends RecyclerView.Adapter<DatabaseAdapter.ViewHo
         }
 
         mItems = itemList;  // your implementation to retrieve the list of items to display
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(DataItem item);
     }
 
     @NonNull
@@ -116,7 +119,6 @@ public class DatabaseAdapter extends RecyclerView.Adapter<DatabaseAdapter.ViewHo
                     }
                 }
             });
-
         }
     }
 }
