@@ -26,11 +26,13 @@ public class DatabaseAdapter extends RecyclerView.Adapter<DatabaseAdapter.ViewHo
 
     private Context mContext;
     private List<DataItem> mItems;
+
     private OnItemClickListener listener;
 
+
     public DatabaseAdapter(Context context, OnItemClickListener listener) {
-        mContext = context;
         this.listener = listener;
+        mContext = context;
 
         List<DataItem> itemList = new ArrayList<>();
         File file = new File(context.getExternalFilesDir(null), "experiments");
@@ -63,7 +65,6 @@ public class DatabaseAdapter extends RecyclerView.Adapter<DatabaseAdapter.ViewHo
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.item_database, parent, false);
-
         return new ViewHolder(view);
     }
 
@@ -79,10 +80,6 @@ public class DatabaseAdapter extends RecyclerView.Adapter<DatabaseAdapter.ViewHo
     @Override
     public int getItemCount() {
         return mItems.size();
-    }
-
-    public interface OnItemClickListener {
-        void onItemClick(DataItem item);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

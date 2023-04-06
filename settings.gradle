@@ -15,6 +15,3 @@ dependencyResolutionManagement {
 rootProject.name = "QCM"
 include ':app'
 include ':sdk'
-include ':java'
-include ':java'
-include ':java'
