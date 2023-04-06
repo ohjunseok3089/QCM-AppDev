@@ -28,6 +28,7 @@ public class DatabaseFragment extends Fragment {
     private FragmentDashboardBinding binding;
 
 
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         TextView receiveDataTextView = getActivity().findViewById(R.id.receive_data);
