@@ -6,12 +6,16 @@
     android:layout_height="match_parent"
     tools:context=".ui.imaging.ImagingFragment">
 
-    <SurfaceView
-        android:id="@+id/cameraView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:layout_editor_absoluteX="11dp"
-        tools:layout_editor_absoluteY="-60dp" />
+    <org.opencv.android.JavaCameraView
+        android:id="@+id/javaCameraView"
+        android:layout_width="382dp"
+        android:layout_height="374dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/buttonCapture"
@@ -19,27 +23,32 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="51dp"
+        android:layout_marginTop="30dp"
         android:text="Take Photo"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_imaging"
-        app:layout_constraintVertical_bias="0.291" />
+        app:layout_constraintTop_toBottomOf="@+id/javaCameraView"
+        app:layout_constraintVertical_bias="0.517" />
 
     <TextView
-        android:id="@+id/text_imaging"
-        android:layout_width="392dp"
-        android:layout_height="352dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        android:id="@+id/green_header"
+        android:layout_width="184dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="16dp"
+        android:text="Number of Green Points: "
         android:textAlignment="center"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        android:textStyle="bold|italic"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.087" />
+        tools:layout_editor_absoluteY="484dp" />
+
+    <TextView
+        android:id="@+id/green_header2"
+        android:layout_width="184dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="12dp"
+        android:text="8100"
+        app:layout_constraintStart_toEndOf="@+id/green_header"
+        tools:layout_editor_absoluteY="484dp" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

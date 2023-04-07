@@ -64,6 +64,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.opencv.android.OpenCVLoader;
 import org.w3c.dom.Text;
 
 import java.io.File;
@@ -117,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<DataPoint> dataPointSeriesFrequency = new ArrayList<>();
     private ArrayList<DataPoint> dataPointSeriesTemp = new ArrayList<>();
     private Workbook curWorkbook;
-
+    private static String LOGTAG_OPENCV = "OpenCV_Log";
 
     @RequiresApi(api = Build.VERSION_CODES.S)
     @SuppressLint("MissingPermission") // permission must be checked before the call of the function!
@@ -139,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
 
+        // List of permissions
         String[] permission_list = {
                 Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -147,10 +149,16 @@ public class MainActivity extends AppCompatActivity {
                 Manifest.permission.ACCESS_LOCATION_EXTRA_COMMANDS,
                 Manifest.permission.BLUETOOTH_SCAN,
                 Manifest.permission.BLUETOOTH_CONNECT,
-                Manifest.permission.BLUETOOTH_PRIVILEGED
+                Manifest.permission.BLUETOOTH_PRIVILEGED,
+                Manifest.permission.CAMERA
         };
-
+        // Ask for permission
         ActivityCompat.requestPermissions(MainActivity.this, permission_list, 1);
+
+        // Checks OpenCV to initialized
+        if (OpenCVLoader.initDebug()) {
+            Log.e(LOGTAG_OPENCV, "OpenCV initialized!");
+        }
 
         GraphView graph = (GraphView) findViewById(R.id.graph);
 
