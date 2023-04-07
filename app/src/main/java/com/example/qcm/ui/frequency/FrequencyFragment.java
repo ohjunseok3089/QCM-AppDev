@@ -38,7 +38,7 @@ public class FrequencyFragment extends Fragment {
 
     private FragmentDashboardBinding binding;
     private Viewport viewportFrequency;
-    ViewGroup rootView;
+    private ViewGroup rootView;
     private TextView rdata;
     private double[] freqTemp;
 
