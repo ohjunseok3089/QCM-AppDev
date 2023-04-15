@@ -209,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         // Bluetooth connection
-//        connectBluetooth();
+        connectBluetooth();
 //        Demo
 //        fm = getSupportFragmentManager();
 //        frequencyFragment = (FrequencyFragment)fm.findFragmentById(R.id.frequencyFragment);
