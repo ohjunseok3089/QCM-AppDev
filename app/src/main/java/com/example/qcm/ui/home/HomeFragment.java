@@ -94,6 +94,7 @@ public class HomeFragment extends Fragment {
 
                         File file = new File(getContext().getExternalFilesDir("experiments"), title + ".xlsx");
                         ((MainActivity)getActivity()).setCurExcelFile(file);
+                        ((MainActivity)getActivity()).setCurExcelName(title);
                         // Check if the file with the given title already exists
                         if (file.exists()) {
                             AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());

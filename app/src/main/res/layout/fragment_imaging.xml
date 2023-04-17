@@ -16,24 +16,7 @@
         app:camera_id="any"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:show_fps="true"
-        android:visibility="gone"/>
-
-    <Button
-        android:id="@+id/buttonCapture"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp"
-        android:layout_marginBottom="40dp"
-        android:text="Take Photo"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/opencv_camera_view"
-        app:layout_constraintVertical_bias="0.517" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/green_header"
@@ -62,5 +45,17 @@
         app:layout_constraintStart_toEndOf="@+id/green_header"
         app:layout_constraintTop_toBottomOf="@id/opencv_camera_view"
         app:layout_constraintVertical_bias="0.0" />
+
+    <ImageView
+        android:id="@+id/takePicture"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_marginTop="32dp"
+        android:src="@drawable/camera_capture"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/opencv_camera_view"
+        app:layout_constraintVertical_bias="0.25" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

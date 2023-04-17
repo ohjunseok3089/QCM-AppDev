@@ -3,6 +3,6 @@
 3    package="org.opencv" >
 4
 5    <uses-sdk android:minSdkVersion="21" />
-5-->/Users/june/Documents/GitHub/QCM/QCM-AppDev/OpenCV/java/AndroidManifest.xml
+5-->C:\Users\ohjun\Desktop\QCM-AppDev\OpenCV\java\AndroidManifest.xml
 6
 7</manifest>

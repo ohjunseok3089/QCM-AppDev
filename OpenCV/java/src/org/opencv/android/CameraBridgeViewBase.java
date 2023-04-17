@@ -424,17 +424,33 @@ public abstract class CameraBridgeViewBase extends SurfaceView implements Surfac
 
         if (bmpValid && mCacheBitmap != null) {
             Canvas canvas = getHolder().lockCanvas();
+            // Junseok Oh
+            // Rotate canvas by 90 degree
+            // for portrait mode with a full screen.
+
+            float mScale1 = 0;
+            float mScale2 = 0;
+
+            if (canvas.getHeight() > canvas.getWidth()) {
+                canvas.rotate(90f, canvas.getWidth() / 2, canvas.getHeight() / 2);
+
+                mScale1 = (float) (canvas).getHeight() / (float) mCacheBitmap.getWidth();
+                mScale2 = (float) (canvas).getWidth() / (float) mCacheBitmap.getHeight();
+            } else {
+                mScale1 = (float) (canvas).getWidth() / (float) mCacheBitmap.getWidth();
+                mScale2 = (float) (canvas).getHeight() / (float) mCacheBitmap.getHeight();
+            }
+
             if (canvas != null) {
                 canvas.drawColor(0, android.graphics.PorterDuff.Mode.CLEAR);
                 if (BuildConfig.DEBUG)
                     Log.d(TAG, "mStretch value: " + mScale);
-
-                if (mScale != 0) {
+                if (mScale1 != 0 && mScale2 != 0) {
                     canvas.drawBitmap(mCacheBitmap, new Rect(0,0,mCacheBitmap.getWidth(), mCacheBitmap.getHeight()),
-                         new Rect((int)((canvas.getWidth() - mScale*mCacheBitmap.getWidth()) / 2),
-                         (int)((canvas.getHeight() - mScale*mCacheBitmap.getHeight()) / 2),
-                         (int)((canvas.getWidth() - mScale*mCacheBitmap.getWidth()) / 2 + mScale*mCacheBitmap.getWidth()),
-                         (int)((canvas.getHeight() - mScale*mCacheBitmap.getHeight()) / 2 + mScale*mCacheBitmap.getHeight())), null);
+                            new Rect((int)((canvas.getWidth() - mScale1*mCacheBitmap.getWidth()) / 2),
+                                    (int)((canvas.getHeight() - mScale2*mCacheBitmap.getHeight()) / 2),
+                                    (int)((canvas.getWidth() - mScale1*mCacheBitmap.getWidth()) / 2 + mScale1*mCacheBitmap.getWidth()),
+                                    (int)((canvas.getHeight() - mScale2*mCacheBitmap.getHeight()) / 2 + mScale2*mCacheBitmap.getHeight())), null);
                 } else {
                      canvas.drawBitmap(mCacheBitmap, new Rect(0,0,mCacheBitmap.getWidth(), mCacheBitmap.getHeight()),
                          new Rect((canvas.getWidth() - mCacheBitmap.getWidth()) / 2,

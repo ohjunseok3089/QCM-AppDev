@@ -98,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
     public TextView rdata;
     private Viewport viewport;
     private File curExcel;
+    private String curExcelName;
     int duration = Toast.LENGTH_LONG;                   // for showToast(), Toast Length
     String uid = "98:D3:41:F6:8D:DE";                   // HC-05 uid
 //    String uid = "98:D3:02:96:17:AE";                   // HC-05 uid 2
@@ -158,6 +159,8 @@ public class MainActivity extends AppCompatActivity {
         // Checks OpenCV to initialized
         if (OpenCVLoader.initDebug()) {
             Log.e(LOGTAG_OPENCV, "OpenCV initialized!");
+        } else {
+            Log.d(LOGTAG_OPENCV, "OpenCV failed to load!");
         }
 
         GraphView graph = (GraphView) findViewById(R.id.graph);
@@ -209,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         // Bluetooth connection
-        connectBluetooth();
+//        connectBluetooth();
 //        Demo
 //        fm = getSupportFragmentManager();
 //        frequencyFragment = (FrequencyFragment)fm.findFragmentById(R.id.frequencyFragment);
@@ -406,6 +409,13 @@ public class MainActivity extends AppCompatActivity {
     public void setCurExcelFile(File current){
         curExcel = current;
     }
+    public void setCurExcelName(String text) {
+        curExcelName = text;
+    }
+    public String getCurExcelName() {
+        return curExcelName;
+    }
+
     public void saveExcelFile() throws IOException {
         // Create a new workbook
         Workbook workbook = WorkbookFactory.create(true);
