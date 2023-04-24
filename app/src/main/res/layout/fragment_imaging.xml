@@ -50,12 +50,11 @@
         android:id="@+id/takePicture"
         android:layout_width="75dp"
         android:layout_height="75dp"
-        android:layout_marginTop="32dp"
         android:src="@drawable/camera_capture"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/opencv_camera_view"
-        app:layout_constraintVertical_bias="0.25" />
+        app:layout_constraintVertical_bias="0.523" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
