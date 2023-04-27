@@ -2,6 +2,7 @@ package com.example.qcm.ui.database;
 
 import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,9 +27,6 @@ import java.util.List;
 public class DatabaseFragment extends Fragment {
 
     private FragmentDashboardBinding binding;
-
-
-
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -56,6 +54,7 @@ public class DatabaseFragment extends Fragment {
                     ((MainActivity) requireActivity()).switchFragment(bundle);
 
                 } else {
+                    Log.d("File not found", fileName);
                     Toast.makeText(getContext(), "File not found: " + fileName, Toast.LENGTH_SHORT).show();
                 }
 

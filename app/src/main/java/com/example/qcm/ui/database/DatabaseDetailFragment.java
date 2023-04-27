@@ -32,6 +32,7 @@ import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -54,7 +55,7 @@ public class DatabaseDetailFragment extends Fragment {
         receiveDataTextView.setVisibility(View.GONE);
 
         rootView = (ViewGroup) inflater.inflate(R.layout.fragment_database_detail, container, false);
-
+        TextView dataTitle = rootView.findViewById(R.id.data_title);
         Bundle bundle = getArguments();
         GraphView graph = (GraphView) rootView.findViewById(R.id.detail_graph);
         LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>();
@@ -73,6 +74,7 @@ public class DatabaseDetailFragment extends Fragment {
         if (bundle != null) {
             String fileName = bundle.getString("fileName");
             System.out.println(fileName);
+            dataTitle.setText(fileName.replace(".xlsx", ""));
             List<int[]> points = loadPoints(fileName, series);
             graph.getViewport().setMaxX(points.size() + 1);
         }

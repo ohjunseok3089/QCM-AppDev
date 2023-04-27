@@ -48,6 +48,7 @@ public class FrequencyFragment extends Fragment {
 
 
     private Thread workerThread = null;                 // To receive a String
+    private String fileName;
 
     @SuppressLint("SetTextI18n")
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -60,7 +61,7 @@ public class FrequencyFragment extends Fragment {
         receiveDataTextView.setVisibility(View.VISIBLE);
 
         boolean isBluetoothConnected = ((MainActivity) getActivity()).checkBluetooth();
-        if (isBluetoothConnected) {
+        if (!isBluetoothConnected) {
             // If it's not connected, then alert that you have to connect it to bluetooth.
             AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
             builder.setTitle("Bluetooth is not connected.");
@@ -75,6 +76,24 @@ public class FrequencyFragment extends Fragment {
 
             // Bluetooth is not connected, go back to previous fragment/screen
             getActivity().onBackPressed();
+            return rootView;
+        }
+        fileName = ((MainActivity) getActivity()).getCurExcelName();
+        if (fileName == null) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+            builder.setTitle("Experiment has not been created.");
+            builder.setMessage("Please go back to home screen and make sure the experiment is created");
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            builder.show();
+
+            // Bluetooth is not connected, go back to previous fragment/screen
+            getActivity().onBackPressed();
+            return rootView;
         }
 
         graph = (GraphView) rootView.findViewById(R.id.graph);

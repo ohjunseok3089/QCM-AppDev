@@ -3,19 +3,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:layout_editor_absoluteX="-2dp"
+    tools:layout_editor_absoluteY="68dp">
 
     <TextView
         android:id="@+id/textView6"
         android:layout_width="180dp"
         android:layout_height="24dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="12dp"
         android:text="Bacteria"
         android:textAlignment="center"
         android:textAllCaps="false"
         android:textStyle="bold|italic"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.112"
+        app:layout_constraintHorizontal_bias="0.103"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView5" />
 
@@ -23,13 +25,13 @@
         android:id="@+id/textView7"
         android:layout_width="180dp"
         android:layout_height="24dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="12dp"
         android:text="Amount"
         android:textAlignment="center"
         android:textAllCaps="false"
         android:textStyle="bold|italic"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.112"
+        app:layout_constraintHorizontal_bias="0.103"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView6" />
 
@@ -37,12 +39,12 @@
         android:id="@+id/amount_text"
         android:layout_width="180dp"
         android:layout_height="24dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="12dp"
         android:text="10^5 CFU/mL"
         android:textAlignment="center"
         android:textAllCaps="false"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.04"
+        app:layout_constraintHorizontal_bias="0.037"
         app:layout_constraintStart_toEndOf="@+id/textView7"
         app:layout_constraintTop_toBottomOf="@+id/bacteria_text" />
 
@@ -50,13 +52,13 @@
         android:id="@+id/textView5"
         android:layout_width="180dp"
         android:layout_height="24dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="36dp"
         android:text="Result"
         android:textAlignment="center"
         android:textAllCaps="false"
         android:textStyle="bold|italic"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.112"
+        app:layout_constraintHorizontal_bias="0.103"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/avg_temp_text" />
 
@@ -64,7 +66,7 @@
         android:id="@+id/result_text"
         android:layout_width="180dp"
         android:layout_height="24dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="36dp"
         android:text="Positive"
         android:textAlignment="center"
         android:textAllCaps="false"
@@ -77,7 +79,7 @@
         android:id="@+id/bacteria_text"
         android:layout_width="180dp"
         android:layout_height="24dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="12dp"
         android:text="E.coli"
         android:textAlignment="center"
         android:textAllCaps="false"
@@ -91,24 +93,26 @@
         android:layout_width="match_parent"
         android:layout_height="250dp"
         android:layout_marginStart="24dp"
+        android:layout_marginTop="32dp"
         android:layout_marginEnd="24dp"
         android:layout_marginBottom="60dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.03" />
+        app:layout_constraintTop_toBottomOf="@+id/data_title"
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="359dp"
         android:layout_height="24dp"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="32dp"
         android:text="Averaged frequency difference (∆f) "
         android:textAlignment="center"
         android:textStyle="bold|italic"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.461"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/detail_graph" />
 
@@ -116,10 +120,11 @@
         android:id="@+id/avg_freq_text"
         android:layout_width="359dp"
         android:layout_height="24dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="12dp"
         android:text="10,000,102 Hz"
         android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.461"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
@@ -127,12 +132,13 @@
         android:id="@+id/textView2"
         android:layout_width="359dp"
         android:layout_height="24dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="20dp"
         android:text="Averaged temperature "
         android:textAlignment="center"
         android:textAllCaps="false"
         android:textStyle="bold|italic"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.461"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/avg_freq_text" />
 
@@ -140,10 +146,23 @@
         android:id="@+id/avg_temp_text"
         android:layout_width="359dp"
         android:layout_height="24dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="12dp"
         android:text="200 F"
         android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.461"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+    <TextView
+        android:id="@+id/data_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="TextView"
+        android:textSize="24sp"
+        android:textStyle="bold|italic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

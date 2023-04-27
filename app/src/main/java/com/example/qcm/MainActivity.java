@@ -165,52 +165,6 @@ public class MainActivity extends AppCompatActivity {
 
         GraphView graph = (GraphView) findViewById(R.id.graph);
 
-        seriesFrequency.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
-        seriesTemp.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
-        dataPointSeriesFrequency.add(new DataPoint(pointsPlotted++, 100));
-        dataPointSeriesTemp.add(new DataPoint(pointsPlotted++, 100));
-        seriesFrequency.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
-        seriesTemp.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
-        dataPointSeriesFrequency.add(new DataPoint(pointsPlotted++, 100));
-        dataPointSeriesTemp.add(new DataPoint(pointsPlotted++, 100));seriesFrequency.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
-        seriesTemp.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
-        dataPointSeriesFrequency.add(new DataPoint(pointsPlotted++, 100));
-        dataPointSeriesTemp.add(new DataPoint(pointsPlotted++, 100));seriesFrequency.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
-        seriesTemp.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
-        dataPointSeriesFrequency.add(new DataPoint(pointsPlotted++, 100));
-        dataPointSeriesTemp.add(new DataPoint(pointsPlotted++, 100));seriesFrequency.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
-        seriesTemp.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
-        dataPointSeriesFrequency.add(new DataPoint(pointsPlotted++, 100));
-        dataPointSeriesTemp.add(new DataPoint(pointsPlotted++, 100));seriesFrequency.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
-        seriesTemp.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
-        dataPointSeriesFrequency.add(new DataPoint(pointsPlotted++, 100));
-        dataPointSeriesTemp.add(new DataPoint(pointsPlotted++, 100));seriesFrequency.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
-        seriesTemp.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
-        dataPointSeriesFrequency.add(new DataPoint(pointsPlotted++, 100));
-        dataPointSeriesTemp.add(new DataPoint(pointsPlotted++, 100));seriesFrequency.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
-        seriesTemp.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
-        dataPointSeriesFrequency.add(new DataPoint(pointsPlotted++, 100));
-        dataPointSeriesTemp.add(new DataPoint(pointsPlotted++, 100));seriesFrequency.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
-        seriesTemp.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
-        dataPointSeriesFrequency.add(new DataPoint(pointsPlotted++, 100));
-        dataPointSeriesTemp.add(new DataPoint(pointsPlotted++, 100));seriesFrequency.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
-        seriesTemp.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
-        dataPointSeriesFrequency.add(new DataPoint(pointsPlotted++, 100));
-        dataPointSeriesTemp.add(new DataPoint(pointsPlotted++, 100));seriesFrequency.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
-        seriesTemp.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
-        dataPointSeriesFrequency.add(new DataPoint(pointsPlotted++, 100));
-        dataPointSeriesTemp.add(new DataPoint(pointsPlotted++, 100));seriesFrequency.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
-        seriesTemp.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
-        dataPointSeriesFrequency.add(new DataPoint(pointsPlotted++, 100));
-        dataPointSeriesTemp.add(new DataPoint(pointsPlotted++, 100));seriesFrequency.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
-        seriesTemp.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
-        dataPointSeriesFrequency.add(new DataPoint(pointsPlotted++, 100));
-        dataPointSeriesTemp.add(new DataPoint(pointsPlotted++, 100));seriesFrequency.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
-        seriesTemp.appendData(new DataPoint(pointsPlotted++, 100), true, pointsPlotted);
-        dataPointSeriesFrequency.add(new DataPoint(pointsPlotted++, 100));
-        dataPointSeriesTemp.add(new DataPoint(pointsPlotted++, 100));
-
-
         // Bluetooth connection
 //        connectBluetooth();
 //        Demo
@@ -235,12 +189,15 @@ public class MainActivity extends AppCompatActivity {
      */
 
     @SuppressLint("MissingPermission") // permission must be checked before the call of the function!
-    public void connectBluetooth() {
+    public void connectBluetooth() throws Exception {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         System.out.println(bluetoothAdapter);
 
         bluetoothDevice = bluetoothAdapter.getRemoteDevice(uid);
         System.out.println(bluetoothDevice.getName());
+        if (bluetoothDevice.getName() == null) {
+            throw new Exception("Connection error!");
+        }
         Toast.makeText(getApplicationContext(), bluetoothDevice.getName() + " bluetooth connection complete!", Toast.LENGTH_SHORT).show();
         int cntTry = 0;
         do {
@@ -271,6 +228,12 @@ public class MainActivity extends AppCompatActivity {
             }
             if (inputStream != null) {
                 inputStream.close();
+            }
+            if (bluetoothDevice != null) {
+                bluetoothDevice = null;
+            }
+            if (bluetoothAdapter != null) {
+                bluetoothAdapter = null;
             }
         } catch (IOException e) {
             e.printStackTrace();

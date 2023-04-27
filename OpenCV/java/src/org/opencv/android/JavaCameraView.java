@@ -172,7 +172,43 @@ public class JavaCameraView extends CameraBridgeViewBase implements PreviewCallb
                     {
                         params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
                     }
+                    List<Camera.Size> sizez = params.getSupportedPictureSizes();
 
+                    // Iterate through all available resolutions and choose one.
+                    // The chosen resolution will be stored in mSize.
+
+                    for (Camera.Size size : sizez) {
+                        Log.i("Junseok", "Available resolution: " + size.width + " " + size.height);
+
+                    }
+                    List<Camera.Size> previewSizes = params.getSupportedPreviewSizes();
+                    List<Camera.Size> pictureSizes = params.getSupportedPictureSizes();
+
+                    Camera.Size closestPreviewSize = null;
+                    int minDiff = Integer.MAX_VALUE;
+                    for (Camera.Size size : previewSizes) {
+                        int diff = Math.abs(size.width - 4032) + Math.abs(size.height - 3024);
+                        if (diff < minDiff) {
+                            closestPreviewSize = size;
+                            minDiff = diff;
+                        }
+                    }
+                    params.setPreviewSize(closestPreviewSize.width, closestPreviewSize.height);
+                    System.out.println("closestPreviewSize: " + closestPreviewSize.width + "x" + closestPreviewSize.height);
+                    Camera.Size closestPictureSize = null;
+                    minDiff = Integer.MAX_VALUE;
+                    for (Camera.Size size : pictureSizes) {
+                        int diff = Math.abs(size.width - 4032) + Math.abs(size.height - 3024);
+                        if (diff < minDiff) {
+                            closestPictureSize = size;
+                            minDiff = diff;
+                        }
+                    }
+                    params.setPictureSize(closestPictureSize.width, closestPictureSize.height);
+                    System.out.println("closestPictureSize: " + closestPictureSize.width + "x" + closestPictureSize.height);
+
+
+                    mCamera.setParameters(params);
                     mCamera.setParameters(params);
                     params = mCamera.getParameters();
 
