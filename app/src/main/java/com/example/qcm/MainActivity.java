@@ -100,8 +100,8 @@ public class MainActivity extends AppCompatActivity {
     private File curExcel;
     private String curExcelName;
     int duration = Toast.LENGTH_LONG;                   // for showToast(), Toast Length
-    String uid = "98:D3:41:F6:8D:DE";                   // HC-05 uid
-//    String uid = "98:D3:02:96:17:AE";                   // HC-05 uid 2
+//    String uid = "98:D3:41:F6:8D:DE";                   // HC-05 uid
+    String uid = "98:D3:02:96:17:AE";                   // HC-05 uid 2
     static final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     private int pointsPlotted = 1;
@@ -166,7 +166,11 @@ public class MainActivity extends AppCompatActivity {
         GraphView graph = (GraphView) findViewById(R.id.graph);
 
         // Bluetooth connection
-//        connectBluetooth();
+//        try {
+//            connectBluetooth();
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
 //        Demo
 //        fm = getSupportFragmentManager();
 //        frequencyFragment = (FrequencyFragment)fm.findFragmentById(R.id.frequencyFragment);
@@ -284,19 +288,28 @@ public class MainActivity extends AppCompatActivity {
                                     handler.post(new Runnable() {
                                         @Override
                                         public void run() {
+                                            System.out.println(text);
                                             rdata.setText(text);
 //                                            frequencyFragment.setText(text);
                                             String[] array = text.split(",");
-                                            rdata.setText("Frequency: " + array[0] + "Hz | Temperature: " + array[1] + "K");
-                                            DataPoint dataFreq = new DataPoint(pointsPlotted, Double.parseDouble(array[0]));
-                                            DataPoint dataTemp = new DataPoint(pointsPlotted, Double.parseDouble(array[1]));
-                                            seriesFrequency.appendData(dataFreq, true, pointsPlotted);
-                                            seriesTemp.appendData(dataTemp, true, pointsPlotted);
-                                            dataPointSeriesFrequency.add(dataFreq);
-                                            dataPointSeriesTemp.add(dataFreq);
+                                            DataPoint dataFreq, dataTemp;
 
-                                            freqTemp[0] = Double.parseDouble(array[0]);
-                                            freqTemp[1] = Double.parseDouble(array[1]);
+//                                            try {
+                                                dataFreq = new DataPoint(pointsPlotted, Double.parseDouble(array[0]));
+                                                freqTemp[0] = Double.parseDouble(array[0]);
+                                                rdata.setText("Frequency: " + array[0] + "Hz | Temperature: " + array[1] + "K");
+                                                seriesFrequency.appendData(dataFreq, true, pointsPlotted);
+
+                                                // it will throw exception here if comma is not there
+                                                dataTemp = new DataPoint(pointsPlotted, Double.parseDouble(array[1]));
+                                                freqTemp[1] = Double.parseDouble(array[1]);
+                                                seriesTemp.appendData(dataTemp, true, pointsPlotted);
+                                                dataPointSeriesFrequency.add(dataFreq);
+                                                dataPointSeriesTemp.add(dataFreq);
+//                                            } catch (ArrayIndexOutOfBoundsException e) {
+//                                                rdata.setText("Frequency: " + array[0]);
+//                                            }
+
                                             if (curWorkbook != null){
                                                 try {
                                                     Sheet sheet = curWorkbook.getSheetAt(0);
@@ -316,21 +329,8 @@ public class MainActivity extends AppCompatActivity {
                                                     throw new RuntimeException(e);
                                                 }
                                             }
-//                                            try {
-//                                                writer = new CSVWriter(new FileWriter(filePath, true));
-//                                            } catch (IOException e) {
-//                                                throw new RuntimeException(e);
-//                                            }
-//                                            writer.writeNext(new String[]{String.valueOf(time_counter), array[0], array[1]});
-//                                            try {
-//                                                writer.close();
-//                                            } catch (IOException e) {
-//                                                throw new RuntimeException(e);
-//                                            }
                                             pointsPlotted++;
                                             time_counter++;
-//                                            viewport.setMaxX(pointsPlotted);
-//                                            viewport.setMinX(pointsPlotted - 50);
                                         }
                                     });
                                 } else {

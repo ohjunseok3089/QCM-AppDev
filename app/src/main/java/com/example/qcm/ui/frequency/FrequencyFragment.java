@@ -160,7 +160,7 @@ public class FrequencyFragment extends Fragment {
                         // Change to the restart button design
                         // For saving method.
                         AlertDialog.Builder builder = new AlertDialog.Builder(rootView.getContext());
-                        builder.setMessage("Would you like to start saving data points?")
+                        builder.setMessage("Would you like to save data points?")
                                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which){

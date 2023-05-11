@@ -113,7 +113,15 @@ public class DatabaseDetailFragment extends Fragment {
                     if (cell2.getCellType() == CellType.NUMERIC) {
                         freq = (int) cell2.getNumericCellValue();
                     } else if (cell2.getCellType() == CellType.STRING) {
-                        freq = Integer.parseInt(cell2.getStringCellValue());
+                        String input = cell2.getStringCellValue();
+                        String expression = input.substring(1, input.length() - 1); // remove the square brackets
+                        String[] parts = expression.split("/");
+                        double temperature = Double.parseDouble(parts[0]);
+                        double frequency = Double.parseDouble(parts[1]);
+
+                        // TODO code 수정
+                        freq = (int) frequency;
+                        temp = (int) temperature;
                     } else {
                         // Handle other cell types if necessary
                     }
