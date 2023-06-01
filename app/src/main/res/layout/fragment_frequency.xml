@@ -54,12 +54,15 @@
 
     <Switch
         android:id="@+id/display_switch_freq"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="48dp"
-        android:layout_marginBottom="90dp"
+        android:layout_width="138dp"
+        android:layout_height="89dp"
+        android:layout_marginStart="56dp"
+        android:layout_marginBottom="112dp"
         android:checked="true"
-        android:thumb="@drawable/ic_display"
+        android:showText="false"
+        android:splitTrack="false"
+        android:thumb="@drawable/display_thumb_track"
+        android:thumbOffset="18dp"
         android:track="@drawable/display_button_track"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

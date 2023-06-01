@@ -162,30 +162,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Log.d(LOGTAG_OPENCV, "OpenCV failed to load!");
         }
-
-        GraphView graph = (GraphView) findViewById(R.id.graph);
-
-        // Bluetooth connection
-//        try {
-//            connectBluetooth();
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
-//        Demo
-//        fm = getSupportFragmentManager();
-//        frequencyFragment = (FrequencyFragment)fm.findFragmentById(R.id.frequencyFragment);
-
-//        viewport = graph.getViewport();
-//        viewport.setScrollable(true);
-//        viewport.setXAxisBoundsManual(true);
-//        graph.addSeries(seriesFrequency);
-//        graph.addSeries(seriesTemp);
-//        viewport.setMaxX(pointsPlotted);
-//        viewport.setMinX(pointsPlotted - 1000);
-//        FrequencyFragment frequencyFragment = (FrequencyFragment) getFragmentManager().findFragmentById(R.id.frequencyFragment);
-//        bluetoothActivity.receiveData(rdata, series, pointsPlotted, viewport);
-        // Bluetooth connection DONE
-
     }
 
     /**
@@ -256,23 +232,11 @@ public class MainActivity extends AppCompatActivity {
 
         readBufferPosition = 0;
         readBuffer = new byte[1024];
-        Date currentTime = Calendar.getInstance().getTime();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
-        String formattedDate = sdf.format(currentTime);
-
-//        String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
-//        String fileName = "AnalysisData_" + formattedDate + ".csv";
-//        String filePath = baseDir + File.separator + fileName;
-//        File f = new File(filePath);
-//        writer = new CSVWriter(new FileWriter(filePath));
-//        String[] header = {"time", "frequency", "temperature"};
-//        writer.writeNext(header);
 
         workerThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 while (!Thread.currentThread().isInterrupted()) {
-//                for (int j = 0; j <= 10; j++) {
                     try {
                         int byteAvaliable = inputStream.available();
                         if (byteAvaliable > 0) {
@@ -290,25 +254,19 @@ public class MainActivity extends AppCompatActivity {
                                         public void run() {
                                             System.out.println(text);
                                             rdata.setText(text);
-//                                            frequencyFragment.setText(text);
                                             String[] array = text.split(",");
                                             DataPoint dataFreq, dataTemp;
 
-//                                            try {
-                                                dataFreq = new DataPoint(pointsPlotted, Double.parseDouble(array[0]));
-                                                freqTemp[0] = Double.parseDouble(array[0]);
-                                                rdata.setText("Frequency: " + array[0] + "Hz | Temperature: " + array[1] + "K");
-                                                seriesFrequency.appendData(dataFreq, true, pointsPlotted);
+                                            dataFreq = new DataPoint(pointsPlotted, Double.parseDouble(array[0]));
+                                            freqTemp[0] = Double.parseDouble(array[0]);
+                                            rdata.setText("Frequency: " + array[0] + "Hz | Temperature: " + array[1] + "K");
+                                            seriesFrequency.appendData(dataFreq, true, pointsPlotted);
 
-                                                // it will throw exception here if comma is not there
-                                                dataTemp = new DataPoint(pointsPlotted, Double.parseDouble(array[1]));
-                                                freqTemp[1] = Double.parseDouble(array[1]);
-                                                seriesTemp.appendData(dataTemp, true, pointsPlotted);
-                                                dataPointSeriesFrequency.add(dataFreq);
-                                                dataPointSeriesTemp.add(dataFreq);
-//                                            } catch (ArrayIndexOutOfBoundsException e) {
-//                                                rdata.setText("Frequency: " + array[0]);
-//                                            }
+                                            dataTemp = new DataPoint(pointsPlotted, Double.parseDouble(array[1]));
+                                            freqTemp[1] = Double.parseDouble(array[1]);
+                                            seriesTemp.appendData(dataTemp, true, pointsPlotted);
+                                            dataPointSeriesFrequency.add(dataFreq);
+                                            dataPointSeriesTemp.add(dataFreq);
 
                                             if (curWorkbook != null){
                                                 try {
@@ -318,10 +276,10 @@ public class MainActivity extends AppCompatActivity {
                                                     cell1.setCellValue(pointsPlotted);
 
                                                     Cell cell2 = row.createCell(1);
-                                                    cell2.setCellValue(dataFreq.toString());
+                                                    cell2.setCellValue(array[0]);
 
                                                     Cell cell3 = row.createCell(2);
-                                                    cell3.setCellValue(dataTemp.toString());
+                                                    cell3.setCellValue(array[1]);
 
                                                     FileOutputStream outputStream = new FileOutputStream(curExcel);
                                                     curWorkbook.write(outputStream);
