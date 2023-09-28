@@ -1,8 +1,7 @@
 1<?xml version="1.0" encoding="utf-8"?>
 2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-3    package="org.opencv" >
+3    package="com.example.qcm" >
 4
 5    <uses-sdk android:minSdkVersion="21" />
-5-->/Users/june/Documents/GitHub/QCM/QCM-AppDev/OpenCV/java/AndroidManifest.xml
 6
 7</manifest>

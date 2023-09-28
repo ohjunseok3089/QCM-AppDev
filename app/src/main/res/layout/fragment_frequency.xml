@@ -54,18 +54,18 @@
 
     <Switch
         android:id="@+id/display_switch_freq"
-        android:layout_width="138dp"
-        android:layout_height="89dp"
-        android:layout_marginStart="56dp"
-        android:layout_marginBottom="112dp"
+        android:layout_width="156dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="44dp"
+        android:layout_marginBottom="90dp"
         android:checked="true"
         android:showText="false"
         android:splitTrack="false"
         android:thumb="@drawable/display_thumb_track"
-        android:thumbOffset="18dp"
         android:track="@drawable/display_button_track"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
 
     <ToggleButton
         android:id="@+id/freq_toggle_button"

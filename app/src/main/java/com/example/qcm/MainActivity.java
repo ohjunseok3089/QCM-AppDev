@@ -1,6 +1,7 @@
 package com.example.qcm;
 
 import android.Manifest;
+import java.util.Random;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -98,9 +99,13 @@ public class MainActivity extends AppCompatActivity {
     public TextView rdata;
     private Viewport viewport;
     private File curExcel;
+//    private File tempFile = new File(getExternalFilesDir("experiments"), "_temp_.xlsx");
+
     private String curExcelName;
     int duration = Toast.LENGTH_LONG;                   // for showToast(), Toast Length
-//    String uid = "98:D3:41:F6:8D:DE";                   // HC-05 uid
+    private int maxSize = 21600; // Default 6 hours
+
+    //    String uid = "98:D3:41:F6:8D:DE";                   // HC-05 uid
     String uid = "98:D3:02:96:17:AE";                   // HC-05 uid 2
     static final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
@@ -120,6 +125,9 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<DataPoint> dataPointSeriesTemp = new ArrayList<>();
     private Workbook curWorkbook;
     private static String LOGTAG_OPENCV = "OpenCV_Log";
+
+    private int batchSize = 50;
+    private int batchCounter = 0;
 
     @RequiresApi(api = Build.VERSION_CODES.S)
     @SuppressLint("MissingPermission") // permission must be checked before the call of the function!
@@ -161,6 +169,12 @@ public class MainActivity extends AppCompatActivity {
             Log.e(LOGTAG_OPENCV, "OpenCV initialized!");
         } else {
             Log.d(LOGTAG_OPENCV, "OpenCV failed to load!");
+        }
+
+        try {
+            receiveDataTest(); // TODO - Make sure to delete this line in production
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -219,6 +233,7 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
     /**
      * Bluetooth Related Methods END
      */
@@ -226,10 +241,78 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Graph Data Related Methods START
      */
+
+    // TODO - Testing code, make sure to delete this line after production.
+
+
+    public void receiveDataTest() throws IOException {
+        final Handler handler = new Handler();
+        final Random random = new Random();  // Add this for generating random numbers
+        readBufferPosition = 0;
+
+        workerThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (!Thread.currentThread().isInterrupted()) {
+                    try {
+                        // Generate random data
+                        double randomFrequency = 50 + (150-50) * random.nextDouble();  // random value between 50 to 150
+                        double randomTemperature = 270 + (370-270) * random.nextDouble(); // random value between 270 to 370
+
+                        final String text = randomFrequency + "," + randomTemperature;
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                System.out.println(text);
+                                rdata.setText(text);
+                                String[] array = text.split(",");
+                                DataPoint dataFreq, dataTemp;
+
+                                dataFreq = new DataPoint(pointsPlotted, Double.parseDouble(array[0]));
+                                freqTemp[0] = Double.parseDouble(array[0]);
+                                rdata.setText("Frequency: " + array[0] + "Hz | Temperature: " + array[1] + "K");
+                                seriesFrequency.appendData(dataFreq, true, pointsPlotted);
+
+                                dataTemp = new DataPoint(pointsPlotted, Double.parseDouble(array[1]));
+                                freqTemp[1] = Double.parseDouble(array[1]);
+                                seriesTemp.appendData(dataTemp, true, pointsPlotted);
+                                dataPointSeriesFrequency.add(dataFreq);
+                                dataPointSeriesTemp.add(dataFreq);
+                                batchCounter++;
+
+                                if (batchCounter >= batchSize) {
+                                    try {
+                                        File tempFile = new File(getExternalFilesDir("experiments"), "_temp_.xlsx");
+                                        saveExcelFile(tempFile);
+                                        batchCounter= 0;
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+
+                                if (dataPointSeriesFrequency.size() > maxSize) {
+                                    dataPointSeriesFrequency.remove(0);
+                                    dataPointSeriesTemp.remove(0);
+                                }
+                            }
+                        });
+
+                    } catch (Exception e){
+                        e.printStackTrace();
+                    }
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        workerThread.start();
+    }
+
     public void receiveData() throws IOException {
         final Handler handler = new Handler();
-//        FrequencyFragment fragment = (FrequencyFragment) getFragmentManager().findFragmentById(R.id.);
-
         readBufferPosition = 0;
         readBuffer = new byte[1024];
 
@@ -238,11 +321,11 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 while (!Thread.currentThread().isInterrupted()) {
                     try {
-                        int byteAvaliable = inputStream.available();
-                        if (byteAvaliable > 0) {
-                            byte[] bytes = new byte[byteAvaliable];
+                        int byteAvailable = inputStream.available();
+                        if (byteAvailable > 0) {
+                            byte[] bytes = new byte[byteAvailable];
                             inputStream.read(bytes);
-                            for (int i = 0; i < byteAvaliable; i++) {
+                            for (int i = 0; i < byteAvailable; i++) {
                                 byte curByte = bytes[i];
                                 if (curByte == '\n') {
                                     byte[] encodedBytes = new byte[readBufferPosition];
@@ -267,28 +350,23 @@ public class MainActivity extends AppCompatActivity {
                                             seriesTemp.appendData(dataTemp, true, pointsPlotted);
                                             dataPointSeriesFrequency.add(dataFreq);
                                             dataPointSeriesTemp.add(dataFreq);
+                                            batchCounter++;
 
-                                            if (curWorkbook != null){
+                                            if (batchCounter >= batchSize) {
                                                 try {
-                                                    Sheet sheet = curWorkbook.getSheetAt(0);
-                                                    Row row = sheet.createRow(pointsPlotted);
-                                                    Cell cell1 = row.createCell(0);
-                                                    cell1.setCellValue(pointsPlotted);
-
-                                                    Cell cell2 = row.createCell(1);
-                                                    cell2.setCellValue(array[0]);
-
-                                                    Cell cell3 = row.createCell(2);
-                                                    cell3.setCellValue(array[1]);
-
-                                                    FileOutputStream outputStream = new FileOutputStream(curExcel);
-                                                    curWorkbook.write(outputStream);
+                                                    File tempFile = new File(getExternalFilesDir("experiments"), "_temp_.xlsx");
+                                                    saveExcelFile(tempFile);
+                                                    batchCounter= 0;
                                                 } catch (IOException e) {
-                                                    throw new RuntimeException(e);
+                                                    e.printStackTrace();
                                                 }
                                             }
-                                            pointsPlotted++;
-                                            time_counter++;
+
+                                            int maxSize = 21600;
+                                            if (dataPointSeriesFrequency.size() > maxSize) {
+                                                dataPointSeriesFrequency.remove(0);
+                                                dataPointSeriesTemp.remove(0);
+                                            }
                                         }
                                     });
                                 } else {
@@ -369,7 +447,42 @@ public class MainActivity extends AppCompatActivity {
         curWorkbook = workbook;
         FileOutputStream outputStream = new FileOutputStream(curExcel);
         workbook.write(outputStream);
+        outputStream.close();
+    }
 
+    public void saveExcelFile(File file) throws IOException {
+        // Create a new workbook
+        Workbook workbook = WorkbookFactory.create(true);
+
+        // Create a new sheet
+        Sheet sheet = workbook.createSheet("Time_Temperature_Frequency");
+
+        Row row1 = sheet.createRow(0);
+
+        Cell cell1 = row1.createCell(0);
+        cell1.setCellValue("Time");
+
+        Cell cell2 = row1.createCell(1);
+        cell2.setCellValue("Temperature");
+
+        Cell cell3 = row1.createCell(2);
+        cell3.setCellValue("Frequency");
+
+        for (int i = 0; i < dataPointSeriesFrequency.size(); i++) {
+            Row row = sheet.createRow(i + 1);
+            cell1 = row.createCell(0);
+            cell1.setCellValue(i + 1);
+
+            cell2 = row.createCell(1);
+            cell2.setCellValue(dataPointSeriesTemp.get(i).getY());
+
+            cell3 = row.createCell(2);
+            cell3.setCellValue(dataPointSeriesFrequency.get(i).getY());
+        }
+        curWorkbook = workbook;
+        FileOutputStream outputStream = new FileOutputStream(file);
+        workbook.write(outputStream);
+        outputStream.close();
     }
     public void restartFreqCollection(){
         seriesFrequency = new LineGraphSeries<DataPoint>();

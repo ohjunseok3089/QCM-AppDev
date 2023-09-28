@@ -1,4 +1,4 @@
-org.opencv
+com.example.qcm
 attr camera_id
 attr show_fps
 id any

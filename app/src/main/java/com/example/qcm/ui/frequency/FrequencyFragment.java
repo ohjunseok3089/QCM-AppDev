@@ -80,7 +80,7 @@ public class FrequencyFragment extends Fragment {
         }
 
         fileName = ((MainActivity) getActivity()).getCurExcelName();
-        if (fileName != null) {
+        if (fileName == null) {
             AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
             builder.setTitle("Experiment has not been created.");
             builder.setMessage("Please go back to home screen and make sure the experiment is created");

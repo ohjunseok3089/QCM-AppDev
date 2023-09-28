@@ -2,6 +2,7 @@ package com.example.qcm.ui.home;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,7 +33,105 @@ import com.example.qcm.databinding.FragmentHomeBinding;
 public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
+    private void showNewExperimentDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("New Experiment");
 
+        final EditText inputTitle = setupExperimentTitleInput();
+
+        LinearLayout layout = setupDialogLayout(inputTitle);
+        builder.setView(layout);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                handleOkButton(inputTitle);
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
+    private EditText setupExperimentTitleInput() {
+        EditText inputTitle = new EditText(requireContext());
+        inputTitle.setInputType(InputType.TYPE_CLASS_TEXT);
+        inputTitle.setHint("Experiment Title");
+        inputTitle.setPadding(20, 20, 20, 40);
+
+        InputFilter[] filters = new InputFilter[1];
+        filters[0] = new InputFilter.LengthFilter(50);
+        inputTitle.setFilters(filters);
+
+        return inputTitle;
+    }
+
+
+
+    private LinearLayout setupDialogLayout(EditText inputTitle) {
+        LinearLayout layout = new LinearLayout(requireContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(40, 20, 40, 20);
+        layout.addView(inputTitle);
+        return layout;
+    }
+
+    private void handleOkButton(EditText inputTitle) {
+        String title = inputTitle.getText().toString();
+        File file = new File(getContext().getExternalFilesDir("experiments"), title + ".xlsx");
+
+        ((MainActivity)getActivity()).setCurExcelFile(file);
+        ((MainActivity)getActivity()).setCurExcelName(title);
+
+        if (file.exists()) {
+            showAlert("Excel File Creation Error", "Experiment title already exists");
+        } else {
+            createExperimentExcelFile(title, file);
+        }
+    }
+
+    private void showAlert(String title, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.show();
+    }
+
+    private void createExperimentExcelFile(String title, File file) {
+        try {
+            File directory = new File(getContext().getExternalFilesDir("fl_images"), title);
+            directory.mkdirs();
+
+            Workbook workbook = WorkbookFactory.create(true);
+            Sheet sheet = workbook.createSheet("Time_Temperature_Frequency");
+
+            Row row1 = sheet.createRow(0);
+            row1.createCell(0).setCellValue("Time");
+            row1.createCell(1).setCellValue("Temperature");
+            row1.createCell(2).setCellValue("Frequency");
+
+            try (FileOutputStream outputStream = new FileOutputStream(file)) {
+                workbook.write(outputStream);
+                showAlert("Excel File Created", "The Excel file \"" + title + "\" has been created.");
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert("Excel File Creation Error", "The Excel file \"" + title + "\" cannot be created.");
+        }
+    }
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         HomeViewModel homeViewModel =
@@ -77,111 +176,8 @@ public class HomeFragment extends Fragment {
         binding.newExp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-                builder.setTitle("New Experiment");
-
-                // Set up the input
-                final EditText inputTitle = new EditText(requireContext());
-
-                // Set the input fields
-                inputTitle.setInputType(InputType.TYPE_CLASS_TEXT);
-                inputTitle.setHint("Experiment Title");
-
-                // Add the input fields to the dialog box
-                LinearLayout layout = new LinearLayout(requireContext());
-                layout.setOrientation(LinearLayout.VERTICAL);
-                layout.addView(inputTitle);
-                builder.setView(layout);
-
-                // Set up the buttons
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String title = inputTitle.getText().toString();
-
-                        File file = new File(getContext().getExternalFilesDir("experiments"), title + ".xlsx");
-                        ((MainActivity)getActivity()).setCurExcelFile(file);
-                        ((MainActivity)getActivity()).setCurExcelName(title);
-                        // Check if the file with the given title already exists
-                        if (file.exists()) {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-                            builder.setTitle("Excel File Creation Error");
-                            builder.setMessage("Experiment title already exists");
-                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            });
-                            builder.show();
-                        } else {
-                            // Save the experiment with the given title and sample
-                            try {
-                                File directory = new File(getContext().getExternalFilesDir("fl_images"), title);
-                                directory.mkdirs();
-
-                                // Create a new workbook
-                                Workbook workbook = WorkbookFactory.create(true);
-
-                                // Create a new sheet
-                                Sheet sheet = workbook.createSheet("Time_Temperature_Frequency");
-
-                                Row row1 = sheet.createRow(0);
-
-                                Cell cell1 = row1.createCell(0);
-                                cell1.setCellValue("Time");
-
-                                Cell cell2 = row1.createCell(1);
-                                cell2.setCellValue("Temperature");
-
-                                Cell cell3 = row1.createCell(2);
-                                cell3.setCellValue("Frequency");
-
-                                FileOutputStream outputStream = new FileOutputStream(file);
-                                workbook.write(outputStream);
-
-                                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-                                builder.setTitle("Excel File Created");
-                                builder.setMessage("The Excel file \"" + title + "\" has been created.");
-                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
-                                });
-                                builder.show();
-                                outputStream.close();
-
-
-                            } catch (IOException e) {
-                                e.printStackTrace();
-
-                                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-                                builder.setTitle("Excel File Creation Error");
-                                builder.setMessage("The Excel file \"" + title + "\" cannot be created.");
-                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
-                                });
-                                builder.show();
-                            }
-
-
-                        }
-                    }
-                });
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-
-                builder.show();
+                showNewExperimentDialog();
             }
-
         });
 
         return root;
