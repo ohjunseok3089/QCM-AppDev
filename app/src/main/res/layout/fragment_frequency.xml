@@ -7,14 +7,24 @@
     android:layout_height="match_parent"
     tools:context=".ui.frequency.FrequencyFragment">
 
+    <TextView
+        android:id="@+id/rt_temp_freq"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:text="0 K"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias=".9"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rt_freqency_freq"
+        app:layout_constraintVertical_bias=".08" />
 
     <com.jjoe64.graphview.GraphView
         android:id="@+id/graph"
         android:layout_width="match_parent"
         android:layout_height="250dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="24dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="60dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -30,53 +40,68 @@
         android:layout_marginTop="128dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.03"/>
 
     <TextView
         android:id="@+id/rt_freqency"
-        android:layout_width="359dp"
+        android:layout_width="wrap_content"
         android:layout_height="24dp"
-        android:layout_marginTop="112dp"
         android:text="Real-time Frequency"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias=".1"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/graph" />
+        app:layout_constraintTop_toBottomOf="@+id/graph"
+        app:layout_constraintVertical_bias="0.36" />
+
+    <TextView
+        android:id="@+id/rt_freqency_freq"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:text="0.00 hz"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias=".9"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/graph"
+        app:layout_constraintVertical_bias=".36" />
 
     <TextView
         android:id="@+id/rt_temp"
-        android:layout_width="360dp"
+        android:layout_width="wrap_content"
         android:layout_height="24dp"
-        android:layout_marginTop="20dp"
         android:text="Real-time Temperature"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rt_freqency" />
-
-    <Switch
-        android:id="@+id/display_switch_freq"
-        android:layout_width="156dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="44dp"
-        android:layout_marginBottom="90dp"
-        android:checked="true"
-        android:showText="false"
-        android:splitTrack="false"
-        android:thumb="@drawable/display_thumb_track"
-        android:track="@drawable/display_button_track"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rt_freqency"
+        app:layout_constraintVertical_bias="0.08" />
 
-
-    <ToggleButton
-        android:id="@+id/freq_toggle_button"
+    <Button
+        android:id="@+id/freq_save_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="48dp"
-        android:layout_marginBottom="90dp"
-        android:textOff=""
-        android:textOn=""
+        android:text="Save"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias=".15"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rt_temp"
+        app:layout_constraintVertical_bias=".65" />
+
+    <Button
+        android:id="@+id/freq_restart_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Restart"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.85"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rt_temp"
+        app:layout_constraintVertical_bias=".65" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

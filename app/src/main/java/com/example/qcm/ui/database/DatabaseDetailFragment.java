@@ -51,8 +51,8 @@ public class DatabaseDetailFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        TextView receiveDataTextView = getActivity().findViewById(R.id.receive_data);
-        receiveDataTextView.setVisibility(View.GONE);
+//        TextView receiveDataTextView = getActivity().findViewById(R.id.receive_data);
+//        receiveDataTextView.setVisibility(View.GONE);
 
         rootView = (ViewGroup) inflater.inflate(R.layout.fragment_database_detail, container, false);
         TextView dataTitle = rootView.findViewById(R.id.data_title);

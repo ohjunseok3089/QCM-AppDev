@@ -2,8 +2,11 @@ package com.example.qcm.ui.home;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.InputFilter;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +26,10 @@ import androidx.lifecycle.ViewModelProvider;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
 
@@ -31,8 +38,14 @@ import com.example.qcm.R;
 import com.example.qcm.databinding.FragmentHomeBinding;
 
 public class HomeFragment extends Fragment {
+    private final Executor backgroundExecutor = Executors.newSingleThreadExecutor();
+    private final Handler mainThreadHandler = new Handler(Looper.getMainLooper());
+    private TextView rdata;
+    private HomeViewModel homeViewModel;
+
 
     private FragmentHomeBinding binding;
+    // Helper function
     private void showNewExperimentDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("New Experiment");
@@ -132,18 +145,16 @@ public class HomeFragment extends Fragment {
             showAlert("Excel File Creation Error", "The Excel file \"" + title + "\" cannot be created.");
         }
     }
+
+    // Main
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         HomeViewModel homeViewModel =
                 new ViewModelProvider(this).get(HomeViewModel.class);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
-
+        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-
-//        final TextView textView = binding.textHome;
         final TextView bluetoothDeviceName = binding.bluetoothDeviceName;
-//        homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
 
         // Bluetooth button
         Switch bluetoothSwitch = root.findViewById(R.id.bluetooth_toggle);
@@ -172,7 +183,27 @@ public class HomeFragment extends Fragment {
                 }
             }
         });
+        // Link ViewModel to MainActivity's data fetch
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).setOnDataFetchedListener(homeViewModel);
+        }
 
+        // Observe the LiveData and update UI
+        homeViewModel.getData().observe(getViewLifecycleOwner(), array -> {
+            if (array != null && array.length == 2) {
+                TextView rdata = root.findViewById(R.id.receive_data_home);  // Adjust ID as necessary
+                rdata.setText("Frequency: " + array[0] + "Hz | Temperature: " + array[1] + "K");
+            } else {
+                Log.d("HomeFragment", "LiveData observed. Data format unexpected.");
+            }
+        });
+
+
+
+        // Trigger fetching data from MainActivity
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).fetchData();
+        }
         binding.newExp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -183,9 +214,14 @@ public class HomeFragment extends Fragment {
         return root;
     }
 
+    /**
+     * Async update rdata
+     */
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+
     }
 }

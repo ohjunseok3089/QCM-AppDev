@@ -4,16 +4,19 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class TemperatureViewModel extends ViewModel {
+import com.example.qcm.MainActivity;
 
-    private final MutableLiveData<String> mText;
+public class TemperatureViewModel extends ViewModel implements MainActivity.OnDataFetchedListener {
 
-    public TemperatureViewModel() {
-        mText = new MutableLiveData<>();
-        mText.setValue("This is temperature fragment");
+    private final MutableLiveData<double[]> data = new MutableLiveData<>();
+
+    public LiveData<double[]> getData() {
+        return data;
     }
 
-    public LiveData<String> getText() {
-        return mText;
+    @Override
+    public void onDataFetched(double[] array) {
+//        Log.d("HomeViewModel", "Data received in ViewModel: " + Arrays.toString(array));
+        data.setValue(array);
     }
 }

@@ -7,36 +7,12 @@
     android:layout_height="match_parent"
     tools:context=".ui.temperature.TemperatureFragment">
 
-    <ToggleButton
-        android:id="@+id/temp_toggle_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="48dp"
-        android:layout_marginBottom="90dp"
-        android:textOff=""
-        android:textOn=""
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <Switch
-        android:id="@+id/display_switch_temp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="48dp"
-        android:layout_marginBottom="90dp"
-        android:checked="true"
-        android:thumb="@drawable/ic_display"
-        android:track="@drawable/display_button_track"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
     <com.jjoe64.graphview.GraphView
         android:id="@+id/graph_temp"
         android:layout_width="match_parent"
         android:layout_height="250dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="24dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="60dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -52,26 +28,78 @@
         android:layout_marginTop="128dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.03"/>
 
     <TextView
         android:id="@+id/rt_freqency_temp"
-        android:layout_width="359dp"
+        android:layout_width="wrap_content"
         android:layout_height="24dp"
-        android:layout_marginTop="112dp"
         android:text="Real-time Frequency"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias=".1"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/graph_temp" />
+        app:layout_constraintTop_toBottomOf="@+id/graph_temp"
+        app:layout_constraintVertical_bias="0.36" />
 
     <TextView
-        android:id="@+id/rt_temp"
-        android:layout_width="360dp"
+        android:id="@+id/rt_temp_temp"
+        android:layout_width="wrap_content"
         android:layout_height="24dp"
-        android:layout_marginTop="20dp"
         android:text="Real-time Temperature"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.1"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rt_freqency_temp" />
+        app:layout_constraintTop_toBottomOf="@+id/rt_freqency_temp"
+        app:layout_constraintVertical_bias="0.08" />
+
+    <TextView
+        android:id="@+id/rt_freqency_temp_data"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:text="0.00 hz"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias=".9"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/graph_temp"
+        app:layout_constraintVertical_bias=".36" />
+    <TextView
+        android:id="@+id/rt_temp_temp_data"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:text="0 K"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias=".9"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rt_freqency_temp"
+        app:layout_constraintVertical_bias=".08" />
+
+    <Button
+        android:id="@+id/temp_save_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Save"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias=".15"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rt_temp_temp"
+        app:layout_constraintVertical_bias=".65" />
+
+    <Button
+        android:id="@+id/temp_restart_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Restart"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.85"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rt_temp_temp"
+        app:layout_constraintVertical_bias=".65" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

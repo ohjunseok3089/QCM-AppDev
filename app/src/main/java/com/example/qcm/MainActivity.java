@@ -1,6 +1,8 @@
 package com.example.qcm;
 
 import android.Manifest;
+
+import java.util.Arrays;
 import java.util.Random;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -16,6 +18,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -79,6 +82,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -128,6 +133,26 @@ public class MainActivity extends AppCompatActivity {
 
     private int batchSize = 50;
     private int batchCounter = 0;
+    private final Executor backgroundExecutor = Executors.newSingleThreadExecutor();
+    private final Handler mainThreadHandler = new Handler(Looper.getMainLooper());
+
+    public interface OnDataFetchedListener {
+        void onDataFetched(double[] array);
+    }
+
+    private OnDataFetchedListener onDataFetchedListener;
+
+    public void setOnDataFetchedListener(OnDataFetchedListener listener){
+        this.onDataFetchedListener = listener;
+    }
+
+    public void fetchData() {
+        if (onDataFetchedListener != null) {
+            onDataFetchedListener.onDataFetched(freqTemp);
+        } else {
+            Log.d("MainActivity", "Listener is NULL!");
+        }
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.S)
     @SuppressLint("MissingPermission") // permission must be checked before the call of the function!
@@ -136,9 +161,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        rdata = (TextView) findViewById(R.id.receive_data);
-        rdata.setText("Please connect to Bluetooth module to receive data");
-        BottomNavigationView navView = findViewById(R.id.nav_view);
 
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
@@ -176,7 +198,10 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
     }
+
+
 
     /**
      * Bluetooth Related Methods START
@@ -244,7 +269,6 @@ public class MainActivity extends AppCompatActivity {
 
     // TODO - Testing code, make sure to delete this line after production.
 
-
     public void receiveDataTest() throws IOException {
         final Handler handler = new Handler();
         final Random random = new Random();  // Add this for generating random numbers
@@ -264,13 +288,11 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void run() {
                                 System.out.println(text);
-                                rdata.setText(text);
                                 String[] array = text.split(",");
                                 DataPoint dataFreq, dataTemp;
 
                                 dataFreq = new DataPoint(pointsPlotted, Double.parseDouble(array[0]));
                                 freqTemp[0] = Double.parseDouble(array[0]);
-                                rdata.setText("Frequency: " + array[0] + "Hz | Temperature: " + array[1] + "K");
                                 seriesFrequency.appendData(dataFreq, true, pointsPlotted);
 
                                 dataTemp = new DataPoint(pointsPlotted, Double.parseDouble(array[1]));
@@ -278,8 +300,10 @@ public class MainActivity extends AppCompatActivity {
                                 seriesTemp.appendData(dataTemp, true, pointsPlotted);
                                 dataPointSeriesFrequency.add(dataFreq);
                                 dataPointSeriesTemp.add(dataFreq);
+                                fetchData();
                                 batchCounter++;
-
+                                pointsPlotted++;
+                                time_counter++;
                                 if (batchCounter >= batchSize) {
                                     try {
                                         File tempFile = new File(getExternalFilesDir("experiments"), "_temp_.xlsx");
@@ -336,22 +360,23 @@ public class MainActivity extends AppCompatActivity {
                                         @Override
                                         public void run() {
                                             System.out.println(text);
-                                            rdata.setText(text);
                                             String[] array = text.split(",");
                                             DataPoint dataFreq, dataTemp;
 
                                             dataFreq = new DataPoint(pointsPlotted, Double.parseDouble(array[0]));
                                             freqTemp[0] = Double.parseDouble(array[0]);
-                                            rdata.setText("Frequency: " + array[0] + "Hz | Temperature: " + array[1] + "K");
                                             seriesFrequency.appendData(dataFreq, true, pointsPlotted);
 
                                             dataTemp = new DataPoint(pointsPlotted, Double.parseDouble(array[1]));
                                             freqTemp[1] = Double.parseDouble(array[1]);
+                                            fetchData();
                                             seriesTemp.appendData(dataTemp, true, pointsPlotted);
                                             dataPointSeriesFrequency.add(dataFreq);
                                             dataPointSeriesTemp.add(dataFreq);
+                                            // TODO - Make a method
                                             batchCounter++;
-
+                                            pointsPlotted++;
+                                            time_counter++;
                                             if (batchCounter >= batchSize) {
                                                 try {
                                                     File tempFile = new File(getExternalFilesDir("experiments"), "_temp_.xlsx");
@@ -401,9 +426,7 @@ public class MainActivity extends AppCompatActivity {
     public ArrayList<DataPoint> getDataPointSeriesTemp() {
         return dataPointSeriesTemp;
     }
-    public double[] getFreqTemp() {
-        return freqTemp;
-    }
+
 
     public void setCurExcelFile(File current){
         curExcel = current;
