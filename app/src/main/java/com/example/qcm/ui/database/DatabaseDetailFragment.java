@@ -76,6 +76,20 @@ public class DatabaseDetailFragment extends Fragment {
             System.out.println(fileName);
             dataTitle.setText(fileName.replace(".xlsx", ""));
             List<int[]> points = loadPoints(fileName, series);
+            double freq_avg = 0.0;
+            double temp_avg = 0.0;
+            for (int hz : points.get(1)) {
+                freq_avg += hz;
+            }
+            for (int tmp : points.get(2)) {
+                temp_avg += tmp;
+            }
+            freq_avg = Math.round(freq_avg / points.get(1).length * 100.0) / 100.0;
+            temp_avg = Math.round(temp_avg / points.get(1).length * 100.0) / 100.0;
+            TextView freq_avg_text = rootView.findViewById(R.id.avg_freq_text);
+            TextView temp_avg_text = rootView.findViewById(R.id.avg_temp_text);
+            freq_avg_text.setText(freq_avg + " Hz");
+            temp_avg_text.setText(temp_avg + "  K");
             graph.getViewport().setMaxX(points.size() + 1);
         }
 

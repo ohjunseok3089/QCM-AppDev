@@ -102,4 +102,15 @@
         app:layout_constraintTop_toBottomOf="@+id/rt_temp_temp"
         app:layout_constraintVertical_bias=".65" />
 
+    <TextView
+        android:id="@+id/touch_val_temp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Touch graph to see point values!"
+        app:layout_constraintBottom_toTopOf="@+id/rt_freqency_temp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/graph_temp"
+        app:layout_constraintVertical_bias="0.06" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

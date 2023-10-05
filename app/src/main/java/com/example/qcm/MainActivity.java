@@ -308,7 +308,7 @@ public class MainActivity extends AppCompatActivity {
                                     try {
                                         File tempFile = new File(getExternalFilesDir("experiments"), "_temp_.xlsx");
                                         saveExcelFile(tempFile);
-                                        batchCounter= 0;
+                                        batchCounter = 0;
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     }
@@ -426,6 +426,7 @@ public class MainActivity extends AppCompatActivity {
     public ArrayList<DataPoint> getDataPointSeriesTemp() {
         return dataPointSeriesTemp;
     }
+    public int getDataSize() {return pointsPlotted;}
 
 
     public void setCurExcelFile(File current){
@@ -507,15 +508,15 @@ public class MainActivity extends AppCompatActivity {
         workbook.write(outputStream);
         outputStream.close();
     }
-    public void restartFreqCollection(){
+    public void restartCollection(){
         seriesFrequency = new LineGraphSeries<DataPoint>();
+        seriesTemp = new LineGraphSeries<DataPoint>();
         dataPointSeriesFrequency = new ArrayList<>();
+        batchCounter = 0;
+        time_counter = 0;
+        pointsPlotted = 1;
     }
 
-    public void restartTempCollection(){
-        seriesTemp = new LineGraphSeries<DataPoint>();
-        dataPointSeriesTemp = new ArrayList<>();
-    }
     /**
      * Graph Data Related Methods END
      */

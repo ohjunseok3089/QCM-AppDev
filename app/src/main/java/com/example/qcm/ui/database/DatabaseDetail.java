@@ -54,9 +54,9 @@ public class DatabaseDetail extends Fragment {
         super.onAttach(context);
         mContext = context;
     }
-    private void loadPoints(String fileName) {
+    private int loadPoints(String fileName) {
         File file = new File(getContext().getExternalFilesDir(null), "experiments/" + fileName);
-
+        int cnt = 0;
         try {
             Workbook workbook = WorkbookFactory.create(file);
             Sheet sheet = workbook.getSheetAt(0);
@@ -68,6 +68,7 @@ public class DatabaseDetail extends Fragment {
                 int x = (int) row.getCell(0).getNumericCellValue();
                 int y = (int) row.getCell(1).getNumericCellValue();
                 points.add(new Point(x, y));
+                cnt++;
             }
 
             // display the points in a chart or a table
@@ -76,5 +77,6 @@ public class DatabaseDetail extends Fragment {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return cnt;
     }
 }
