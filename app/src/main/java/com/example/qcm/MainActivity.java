@@ -119,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
 
     private int graphIntervalCounter = 0;
     private double[] freqTemp = {0, 0};
+    private static final int REQUEST_IMAGE_CAPTURE = 672;
 
     private CSVWriter writer;
     private FragmentManager fm;
@@ -553,6 +554,16 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
     );
+
+    /**
+     *  Camera Application Methods STARTS
+     */
+
+
+
+    /**
+     *  Camera Application Methods ENDS
+     */
 
     @SuppressLint("MissingPermission")
     public void selectDevice() {

@@ -2,9 +2,18 @@ package com.example.qcm.ui.imaging;
 
 import static androidx.fragment.app.FragmentManager.TAG;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Camera;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -14,12 +23,16 @@ import android.view.Surface;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -55,9 +68,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
-public class ImagingFragment extends Fragment implements CameraBridgeViewBase.CvCameraViewListener2 {
+public class ImagingFragment extends Fragment {
 
     private FragmentDashboardBinding binding;
     private ViewGroup rootView;
@@ -71,36 +85,76 @@ public class ImagingFragment extends Fragment implements CameraBridgeViewBase.Cv
     private String image_name;
     private String img_location;
     private TextView points_val;
+    private Button cameraBtn, galleryBtn;
+    private File capturedImage;
+    private String imageFilePath;
+    private Uri photoUri;
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private File img_folder;
 
-    private BaseLoaderCallback mLoaderCallBack = new BaseLoaderCallback(getContext()) {
-        @Override
-        public void onManagerConnected(int status) {
-            switch (status) {
-                case LoaderCallbackInterface.SUCCESS: {
-                    Log.i(LOGTAG_OPENCV, "OpenCV Loaded");
-                    mOpenCVCameraView.enableView();
-                } break;
-                default: {
-                    Log.e(LOGTAG_OPENCV, "OpenCV Loading Failed!");
-                    super.onManagerConnected(status);
-                } break;
+    @SuppressLint("QueryPermissionsNeeded")
+    private void openCamera(File directory){
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(requireActivity().getPackageManager()) != null) {
+            try {
+                capturedImage = createImageFile(directory);
+                if (capturedImage != null) {
+                    Uri photoURI = FileProvider.getUriForFile(requireContext(),
+                            "com.example.qcm.fileprovider", // replace with your app's package name + ".fileprovider"
+                            capturedImage);
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                }
+            } catch (IOException e){
+                e.printStackTrace();
             }
+        }
+    }
+
+    private File createImageFile(File directory) throws IOException {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        return File.createTempFile(imageFileName, ".jpg", directory);
+    }
+    @SuppressLint("QueryPermissionsNeeded")
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        if (takePictureIntent.resolveActivity(requireActivity().getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile(img_folder);
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+            }
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(requireContext(),
+                        "com.example.qcm.file_paths",
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            }
+        }
+    }
+
+    // This method will help to retrieve the image
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // Match the request 'pic id with requestCode
+        if (requestCode == REQUEST_IMAGE_CAPTURE) {
+            // BitMap is data structure of image file which store the image in memory
+            // Set the image in imageview for display
 
         }
-    };
+    }
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         ImagingViewModel imagingViewModel =
                 new ViewModelProvider(this).get(ImagingViewModel.class);
         rootView = (ViewGroup) inflater.inflate(R.layout.fragment_imaging, container, false);
-        points_val = rootView.findViewById(R.id.green_header2);
-        mOpenCVCameraView = (CameraBridgeViewBase) rootView.findViewById(R.id.opencv_camera_view);
-        mOpenCVCameraView.setVisibility(SurfaceView.VISIBLE);
-        mOpenCVCameraView.setCameraPermissionGranted();
-        mOpenCVCameraView.setCvCameraViewListener(this);
-        take_picture_button = rootView.findViewById(R.id.takePicture);
-
-        image_name = ((MainActivity) getActivity()).getCurExcelName();
+        image_name = ((MainActivity) requireActivity()).getCurExcelName();
         if (image_name == null) {
             AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
             builder.setTitle("Experiment has not been created.");
@@ -114,99 +168,55 @@ public class ImagingFragment extends Fragment implements CameraBridgeViewBase.Cv
             builder.show();
 
             // Bluetooth is not connected, go back to previous fragment/screen
-            getActivity().onBackPressed();
+            requireActivity().onBackPressed();
             return rootView;
         }
-
-
-
-        File img_folder = new File (getContext().getExternalFilesDir("fl_images"), image_name);
+        img_folder = new File (getContext().getExternalFilesDir("fl_images"), image_name);
         img_location = img_folder.getAbsolutePath();
-        take_picture_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (take_image == 0) {
-                    take_image = 1;
-                } else {
-                    take_image = 0;
-                }
-            }
+        cameraBtn = rootView.findViewById(R.id.capture_image);
+        galleryBtn = rootView.findViewById(R.id.view_fl_image);
+
+        cameraBtn.setOnClickListener(v -> {
+            dispatchTakePictureIntent();
         });
 
         return rootView;
-    }
-    protected List<?extends CameraBridgeViewBase> getCameraViewList() {
-        return Collections.singletonList(mOpenCVCameraView);
-    }
+}
 
+    private static final int REQUEST_CAMERA_PERMISSION = 1;
+    private static final int REQUEST_STORAGE_PERMISSION = 2;
 
-    public void onPause() {
-        super.onPause();
-        if (mOpenCVCameraView != null) {
-            mOpenCVCameraView.disableView();
-        }
-    }
-    public void onResume() {
-        super.onResume();
-        if (OpenCVLoader.initDebug()) {
-            Log.d(LOGTAG_OPENCV, "OpenCV found, Initializing");
-            mLoaderCallBack.onManagerConnected(LoaderCallbackInterface.SUCCESS);
-
+    private void requestCameraPermission() {
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
         } else {
-            Log.d(LOGTAG_OPENCV, "OpenCV not found, Initializing");
-            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION, getContext(), mLoaderCallBack);
+            openCamera(img_folder);
         }
     }
-    public void onDestroy() {
-        super.onDestroy();
-        if (mOpenCVCameraView != null) {
-            mOpenCVCameraView.disableView();
+
+    private void requestStoragePermission() {
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_STORAGE_PERMISSION);
+        } else {
+            // Handle storage actions here
         }
     }
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
-    }
 
     @Override
-    public void onCameraViewStarted(int width, int height) {
-        mRgba = new Mat(height, width, CvType.CV_8UC4);
-        mGray = new Mat(height, width, CvType.CV_8UC1);
-    }
-
-    @Override
-    public void onCameraViewStopped() {
-        mRgba.release();
-    }
-
-    @Override
-    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-        mRgba = inputFrame.rgba();
-        mGray = inputFrame.gray();
-        take_image = take_picture_function_rgb(take_image, mRgba);
-
-        return mRgba;
-    }
-
-
-    private int take_picture_function_rgb(int take_image, Mat mRgba) {
-        if (take_image == 1) {
-            Mat save_mat = new Mat();
-            Core.flip(mRgba.t(), save_mat, 1);
-            Imgproc.cvtColor(save_mat, save_mat, Imgproc.COLOR_RGBA2BGRA);
-            File folder = new File(img_location);
-            if (!folder.exists()) {
-                folder.mkdirs();
-            }
-
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-            String currentTime = sdf.format(new Date());
-            String fileName = img_location + "/" + image_name + "_" + currentTime + ".jpg";
-            Imgcodecs.imwrite(fileName, save_mat);
-            take_image = 0;
-//            Toast.makeText(rootView.getContext(),"Saved into " + img_location + "!", Toast.LENGTH_LONG).show();
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case REQUEST_CAMERA_PERMISSION:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    openCamera(img_folder);
+                } else {
+                    Toast.makeText(getContext(), "Camera permission is required to use the camera", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case REQUEST_STORAGE_PERMISSION:
+                // Handle storage permission result if needed
+                break;
         }
-        return take_image;
     }
+
 }

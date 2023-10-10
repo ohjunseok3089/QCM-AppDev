@@ -65,7 +65,7 @@ public class FrequencyFragment extends Fragment {
     private String fileName;
 
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint({"SetTextI18n", "ClickableViewAccessibility"})
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         FrequencyViewModel frequencyViewModel =
