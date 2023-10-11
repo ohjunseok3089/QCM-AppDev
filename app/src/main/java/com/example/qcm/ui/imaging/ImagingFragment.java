@@ -1,5 +1,6 @@
 package com.example.qcm.ui.imaging;
 
+import static android.app.Activity.RESULT_OK;
 import static androidx.fragment.app.FragmentManager.TAG;
 
 import android.Manifest;
@@ -13,6 +14,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Camera;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -24,6 +26,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -62,6 +65,7 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -73,15 +77,7 @@ import java.util.Objects;
 
 public class ImagingFragment extends Fragment {
 
-    private FragmentDashboardBinding binding;
     private ViewGroup rootView;
-    private CameraBridgeViewBase mOpenCVCameraView;
-    private static String LOGTAG_OPENCV = "OpenCV_Log";
-    private Mat mRgba;
-    private Mat mGray;
-    private int mCameraId = 0;
-    private ImageView take_picture_button;
-    private int take_image = 0;
     private String image_name;
     private String img_location;
     private TextView points_val;
@@ -93,61 +89,6 @@ public class ImagingFragment extends Fragment {
     private File img_folder;
 
     @SuppressLint("QueryPermissionsNeeded")
-    private void openCamera(File directory){
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(requireActivity().getPackageManager()) != null) {
-            try {
-                capturedImage = createImageFile(directory);
-                if (capturedImage != null) {
-                    Uri photoURI = FileProvider.getUriForFile(requireContext(),
-                            "com.example.qcm.fileprovider", // replace with your app's package name + ".fileprovider"
-                            capturedImage);
-                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-                }
-            } catch (IOException e){
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private File createImageFile(File directory) throws IOException {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        return File.createTempFile(imageFileName, ".jpg", directory);
-    }
-    @SuppressLint("QueryPermissionsNeeded")
-    private void dispatchTakePictureIntent() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-        if (takePictureIntent.resolveActivity(requireActivity().getPackageManager()) != null) {
-            // Create the File where the photo should go
-            File photoFile = null;
-            try {
-                photoFile = createImageFile(img_folder);
-            } catch (IOException ex) {
-                // Error occurred while creating the File
-            }
-            if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(requireContext(),
-                        "com.example.qcm.file_paths",
-                        photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-            }
-        }
-    }
-
-    // This method will help to retrieve the image
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        // Match the request 'pic id with requestCode
-        if (requestCode == REQUEST_IMAGE_CAPTURE) {
-            // BitMap is data structure of image file which store the image in memory
-            // Set the image in imageview for display
-
-        }
-    }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -171,52 +112,120 @@ public class ImagingFragment extends Fragment {
             requireActivity().onBackPressed();
             return rootView;
         }
-        img_folder = new File (getContext().getExternalFilesDir("fl_images"), image_name);
+
+        img_folder = new File(requireContext().getExternalFilesDir("fl_images"), image_name);
         img_location = img_folder.getAbsolutePath();
         cameraBtn = rootView.findViewById(R.id.capture_image);
         galleryBtn = rootView.findViewById(R.id.view_fl_image);
 
         cameraBtn.setOnClickListener(v -> {
-            dispatchTakePictureIntent();
+            requestCameraPermission();
         });
 
         return rootView;
-}
+    }
 
-    private static final int REQUEST_CAMERA_PERMISSION = 1;
-    private static final int REQUEST_STORAGE_PERMISSION = 2;
-
-    private void requestCameraPermission() {
-        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
-        } else {
-            openCamera(img_folder);
+    private void openCamera() {
+        Log.d("openCamera", "Method called");
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        try {
+            File photoFile = createImageFile();
+            if (photoFile != null) {
+                photoUri = FileProvider.getUriForFile(
+                        requireContext(),
+                        "com.example.qcm.fileprovider",
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } catch (ActivityNotFoundException e) {
+            // No activity to handle the intent (this should give us more info if the issue is here)
+            Log.e("openCamera", "No activity found to handle camera intent", e);
         }
     }
 
-    private void requestStoragePermission() {
-        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_STORAGE_PERMISSION);
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            promptForFileNameAndRename();
+        }
+    }
+
+    private void promptForFileNameAndRename() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Enter Image Name");
+
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        final EditText input = new EditText(requireContext());
+        input.setText(timeStamp);
+        builder.setView(input);
+
+        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String newFilename = input.getText().toString();
+                renameCapturedImage(newFilename);
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+    }
+
+    private void renameCapturedImage(String newFilename) {
+        File oldFile = new File(imageFilePath);
+        File newFile = new File(oldFile.getParent(), newFilename + ".jpg");
+        if (oldFile.renameTo(newFile)) {
+            imageFilePath = newFile.getAbsolutePath();
+            Toast.makeText(requireContext(), "Image saved as " + newFilename, Toast.LENGTH_SHORT).show();
         } else {
-            // Handle storage actions here
+            Toast.makeText(requireContext(), "Failed to rename image", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private File createImageFile() throws IOException {
+        // Get the directory where the file will be saved
+        File storageDir = new File(requireContext().getExternalFilesDir("fl_images"), image_name);
+
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        imageFilePath = image.getAbsolutePath();
+        return image;
+    }
+    private static final int CAMERA_PERMISSION_REQUEST_CODE = 100;
+
+    private void requestCameraPermission() {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
+        } else {
+            openCamera();
         }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case REQUEST_CAMERA_PERMISSION:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    openCamera(img_folder);
-                } else {
-                    Toast.makeText(getContext(), "Camera permission is required to use the camera", Toast.LENGTH_SHORT).show();
-                }
-                break;
-            case REQUEST_STORAGE_PERMISSION:
-                // Handle storage permission result if needed
-                break;
+        if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openCamera();
+            } else {
+                Toast.makeText(requireContext(), "Camera permission is required", Toast.LENGTH_LONG).show();
+            }
         }
     }
-
 }

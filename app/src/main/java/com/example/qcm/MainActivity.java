@@ -15,10 +15,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,6 +42,7 @@ import com.example.qcm.ui.frequency.FrequencyFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.FragmentContainerView;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
@@ -558,8 +561,6 @@ public class MainActivity extends AppCompatActivity {
     /**
      *  Camera Application Methods STARTS
      */
-
-
 
     /**
      *  Camera Application Methods ENDS
