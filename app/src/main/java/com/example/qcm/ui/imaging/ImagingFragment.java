@@ -82,11 +82,12 @@ public class ImagingFragment extends Fragment {
     private String img_location;
     private TextView points_val;
     private Button cameraBtn, galleryBtn;
-    private File capturedImage;
     private String imageFilePath;
     private Uri photoUri;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private File img_folder;
+    private File saved_image;
+    private ImageView fl_image_view;
 
     @SuppressLint("QueryPermissionsNeeded")
 
@@ -116,7 +117,8 @@ public class ImagingFragment extends Fragment {
         img_folder = new File(requireContext().getExternalFilesDir("fl_images"), image_name);
         img_location = img_folder.getAbsolutePath();
         cameraBtn = rootView.findViewById(R.id.capture_image);
-        galleryBtn = rootView.findViewById(R.id.view_fl_image);
+        galleryBtn = rootView.findViewById(R.id.view_image_button);
+        fl_image_view = rootView.findViewById(R.id.fl_image_view);
 
         cameraBtn.setOnClickListener(v -> {
             requestCameraPermission();
@@ -152,6 +154,8 @@ public class ImagingFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             promptForFileNameAndRename();
+            Bitmap myBitmap = BitmapFactory.decodeFile(imageFilePath);
+            fl_image_view.setImageBitmap(myBitmap);
         }
     }
 
@@ -197,7 +201,7 @@ public class ImagingFragment extends Fragment {
 
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
+        String imageFileName = timeStamp + "_";
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
                 ".jpg",         /* suffix */
