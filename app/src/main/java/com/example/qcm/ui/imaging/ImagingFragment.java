@@ -53,6 +53,15 @@ import org.opencv.core.Size;
 import org.opencv.features2d.SimpleBlobDetector;
 import org.opencv.features2d.SimpleBlobDetector_Params;
 import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
+import org.opencv.core.Core;
+import org.opencv.android.Utils;
+import org.opencv.core.MatOfByte;
 
 
 import org.opencv.android.BaseLoaderCallback;
@@ -88,6 +97,7 @@ public class ImagingFragment extends Fragment {
     private File img_folder;
     private File saved_image;
     private ImageView fl_image_view;
+
 
     @SuppressLint("QueryPermissionsNeeded")
 
@@ -231,5 +241,44 @@ public class ImagingFragment extends Fragment {
                 Toast.makeText(requireContext(), "Camera permission is required", Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    private void processAndDisplayImage(String imagePath) {
+        Mat image = Imgcodecs.imread(imagePath);
+        Core.rotate(image, image, Core.ROTATE_180);
+
+        int rows = image.rows();
+        int cols = image.cols();
+
+        int center_x = 1720;
+        int center_y = 1280;
+        int radius = 1000;
+
+        Mat mask = new Mat(rows, cols, CvType.CV_8U, new Scalar(0));
+        Imgproc.circle(mask, new Point(center_x, center_y), radius, new Scalar(255), -1);
+
+        List<Mat> channels = new ArrayList<>();
+        Core.split(image, channels);
+        for (Mat channel : channels) {
+            Core.bitwise_and(channel, mask, channel);
+        }
+
+        Mat greenChannel = channels.get(1);
+
+        int threshold = 110;
+        Mat binaryMask = new Mat();
+        Core.inRange(greenChannel, new Scalar(1), new Scalar(threshold), binaryMask);
+
+        double totalIntensity = Core.sumElems(greenChannel).val[0];
+        int numPixels = Core.countNonZero(binaryMask);
+        double averageIntensity = totalIntensity / numPixels;
+        Log.d("Average Intensity: ", Double.toString(averageIntensity));
+        Mat maskedOriginalImageRGB = new Mat();
+        Core.merge(channels, maskedOriginalImageRGB);
+
+        Bitmap bmp = Bitmap.createBitmap(maskedOriginalImageRGB.cols(), maskedOriginalImageRGB.rows(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(maskedOriginalImageRGB, bmp);
+        fl_image_view.setImageBitmap(bmp);
+
     }
 }
