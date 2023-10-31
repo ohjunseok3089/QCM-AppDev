@@ -44,6 +44,9 @@ public class TemperatureFragment extends Fragment {
     private GraphView graph;
     private ArrayList<DataPoint> dataPointSeriesFrequency;
     private String fileName;
+    private boolean isUserScrolled = false;
+
+    @SuppressLint("ClickableViewAccessibility")
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         TemperatureViewModel temperatureViewModel =
@@ -106,6 +109,17 @@ public class TemperatureFragment extends Fragment {
         graph.getGridLabelRenderer().setVerticalAxisTitle("Temperature (K)");
         graph.getGridLabelRenderer().setHorizontalAxisTitle("Time (s)");
         graph.setTitle("Temperature (K) / Time (s)");
+
+        graph.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                if (scrollX != oldScrollX) {
+                    isUserScrolled = true;
+                }
+            }
+        });
+
+
         graph.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -152,8 +166,16 @@ public class TemperatureFragment extends Fragment {
                 TextView rdata_temp = rootView.findViewById(R.id.rt_temp_temp_data);
                 rdata_freq.setText(array[0] + "Hz");
                 rdata_temp.setText(array[1] + "K");
-                viewportTemperature.setMaxX(((MainActivity)getActivity()).getDataSize());
-            } else {
+                int dataSize = ((MainActivity)getActivity()).getDataSize();
+                if (!isUserScrolled) {
+                    if (dataSize > 200) {
+                        viewportTemperature.setMinX(dataSize - 200);
+                        viewportTemperature.setMaxX(dataSize);
+                    } else {
+                        viewportTemperature.setMinX(0);
+                        viewportTemperature.setMaxX(dataSize);
+                    }
+                }            } else {
                 Log.d("HomeFragment", "LiveData observed. Data format unexpected.");
             }
         });

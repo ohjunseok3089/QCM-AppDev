@@ -1,28 +1,20 @@
 package com.example.qcm.ui.imaging;
 
 import static android.app.Activity.RESULT_OK;
-import static androidx.fragment.app.FragmentManager.TAG;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.ActivityNotFoundException;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Camera;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Surface;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -41,48 +33,24 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.qcm.MainActivity;
 import com.example.qcm.R;
-import com.example.qcm.databinding.FragmentDashboardBinding;
 
-import org.opencv.android.OpenCVLoader;
-import org.opencv.core.KeyPoint;
-import org.opencv.core.MatOfKeyPoint;
-import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
-import org.opencv.core.Rect;
-import org.opencv.core.Size;
-import org.opencv.features2d.SimpleBlobDetector;
-import org.opencv.features2d.SimpleBlobDetector_Params;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.core.Point;
 import org.opencv.core.Scalar;
-import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.core.Core;
 import org.opencv.android.Utils;
-import org.opencv.core.MatOfByte;
 
-
-import org.opencv.android.BaseLoaderCallback;
-import org.opencv.android.CameraBridgeViewBase;
-import org.opencv.android.LoaderCallbackInterface;
-import org.opencv.core.Core;
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
-import org.opencv.core.Scalar;
-import org.opencv.imgproc.Imgproc;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 public class ImagingFragment extends Fragment {
 
@@ -97,6 +65,8 @@ public class ImagingFragment extends Fragment {
     private File img_folder;
     private File saved_image;
     private ImageView fl_image_view;
+    private ImageView fl_image_view_2;
+    private TextView process_textview;
 
 
     @SuppressLint("QueryPermissionsNeeded")
@@ -129,10 +99,13 @@ public class ImagingFragment extends Fragment {
         cameraBtn = rootView.findViewById(R.id.capture_image);
         galleryBtn = rootView.findViewById(R.id.view_image_button);
         fl_image_view = rootView.findViewById(R.id.fl_image_view);
+        fl_image_view_2 = rootView.findViewById(R.id.fl_image_view_post_process);
+        process_textview = rootView.findViewById(R.id.process_result);
 
         cameraBtn.setOnClickListener(v -> {
             requestCameraPermission();
         });
+
 
         return rootView;
     }
@@ -203,6 +176,8 @@ public class ImagingFragment extends Fragment {
         } else {
             Toast.makeText(requireContext(), "Failed to rename image", Toast.LENGTH_SHORT).show();
         }
+        processAndDisplayImage(newFile.getAbsolutePath());
+
     }
 
     private File createImageFile() throws IOException {
@@ -243,42 +218,196 @@ public class ImagingFragment extends Fragment {
         }
     }
 
+    private void testImageProcessing() {
+        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.test_image);
+
+        Mat imageMat = new Mat(bmp.getHeight(), bmp.getWidth(), CvType.CV_8UC3);
+        Utils.bitmapToMat(bmp, imageMat);
+
+        String tempFilePath = saveMatToTempFile(imageMat);
+
+        if (tempFilePath != null) {
+            processAndDisplayImage(tempFilePath);
+        }
+    }
+
+    private String saveMatToTempFile(Mat mat) {
+        if (getActivity() == null) {
+            return null;
+        }
+
+        File tempFile = new File(getActivity().getCacheDir(), "temp_image.jpg");
+        boolean result = Imgcodecs.imwrite(tempFile.getAbsolutePath(), mat);
+        if (result) {
+            return tempFile.getAbsolutePath();
+        } else {
+            return null;
+        }
+    }
+
+
+//    private void processAndDisplayImage(String imagePath) {
+//        Mat image = Imgcodecs.imread(imagePath);
+////        Core.rotate(image, image, Core.ROTATE_180);
+//// Convert drawable resource to bitmap
+//        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.test_image);
+//
+//        // Convert bitmap to Mat
+//        Mat image = new Mat(bmp.getHeight(), bmp.getWidth(), CvType.CV_8UC3);
+//        Utils.bitmapToMat(bmp, image);
+//
+//        int rows = image.rows();
+//        int cols = image.cols();
+//
+//        int center_x = 1720;
+//        int center_y = 1280;
+//        int radius = 1000;
+//
+//        Mat mask = new Mat(rows, cols, CvType.CV_8U, new Scalar(0));
+//        Imgproc.circle(mask, new Point(center_x, center_y), radius, new Scalar(255), -1);
+//
+//        List<Mat> channels = new ArrayList<>();
+//        Core.split(image, channels);
+//        for (Mat channel : channels) {
+//            Core.bitwise_and(channel, mask, channel);
+//        }
+//
+//        Mat greenChannel = channels.get(1);
+//
+//        int threshold = 110;
+//        Mat binaryMask = new Mat();
+//        Core.inRange(greenChannel, new Scalar(1), new Scalar(threshold), binaryMask);
+//
+//        double totalIntensity = Core.sumElems(greenChannel).val[0];
+//        int numPixels = Core.countNonZero(binaryMask);
+//        double averageIntensity = totalIntensity / numPixels;
+//
+//        Mat maskedOriginalImageRGB = new Mat();
+//        Core.merge(channels, maskedOriginalImageRGB);
+//
+//        // Save the processed image
+//        String processedImagePath = imagePath.replace(".jpg", "_processed.jpg");
+//        Imgcodecs.imwrite(processedImagePath, maskedOriginalImageRGB);
+//
+//        // Convert the saved image to a Bitmap
+//        bmp = BitmapFactory.decodeFile(processedImagePath);
+//        fl_image_view.setImageBitmap(bmp);
+//
+//        // Display the statistics (you can adjust this as needed)
+//        Toast.makeText(requireContext(),
+//                "Total Intensity: " + totalIntensity +
+//                        ", Num Pixels: " + numPixels +
+//                        ", Avg Intensity: " + averageIntensity,
+//                Toast.LENGTH_LONG).show();
+//    }
+
+    @SuppressLint("SetTextI18n")
     private void processAndDisplayImage(String imagePath) {
         Mat image = Imgcodecs.imread(imagePath);
-        Core.rotate(image, image, Core.ROTATE_180);
 
         int rows = image.rows();
         int cols = image.cols();
 
         int center_x = 1720;
         int center_y = 1280;
-        int radius = 1000;
+        int radius = 1000; // Fixed
+        int threshold = 110;
 
         Mat mask = new Mat(rows, cols, CvType.CV_8U, new Scalar(0));
         Imgproc.circle(mask, new Point(center_x, center_y), radius, new Scalar(255), -1);
 
-        List<Mat> channels = new ArrayList<>();
-        Core.split(image, channels);
-        for (Mat channel : channels) {
-            Core.bitwise_and(channel, mask, channel);
-        }
+        Mat maskedImage = new Mat();
+        Core.bitwise_and(image, image, maskedImage, mask);
 
+        List<Mat> channels = new ArrayList<>();
+        Core.split(maskedImage, channels);
         Mat greenChannel = channels.get(1);
 
-        int threshold = 110;
+
         Mat binaryMask = new Mat();
         Core.inRange(greenChannel, new Scalar(1), new Scalar(threshold), binaryMask);
+
+        Mat croppedImage = new Mat();
+        maskedImage.copyTo(croppedImage, binaryMask);
 
         double totalIntensity = Core.sumElems(greenChannel).val[0];
         int numPixels = Core.countNonZero(binaryMask);
         double averageIntensity = totalIntensity / numPixels;
-        Log.d("Average Intensity: ", Double.toString(averageIntensity));
-        Mat maskedOriginalImageRGB = new Mat();
-        Core.merge(channels, maskedOriginalImageRGB);
 
-        Bitmap bmp = Bitmap.createBitmap(maskedOriginalImageRGB.cols(), maskedOriginalImageRGB.rows(), Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(maskedOriginalImageRGB, bmp);
-        fl_image_view.setImageBitmap(bmp);
+        // Save the processed image
+        String processedImagePath = imagePath.replace(".jpg", "_processed.jpg");
+        Imgcodecs.imwrite(processedImagePath, croppedImage);
 
+        // Convert the saved image to a Bitmap
+        Bitmap bmp = BitmapFactory.decodeFile(processedImagePath);
+        fl_image_view_2.setImageBitmap(bmp);
+
+        process_textview.setText("Total Intensity: " + totalIntensity +
+                ", Num Pixels: " + numPixels +
+                ", Avg Intensity: " + averageIntensity);
+
+        // Display the statistics (you can adjust this as needed)
+        Toast.makeText(requireContext(),
+                "Total Intensity: " + totalIntensity +
+                        ", Num Pixels: " + numPixels +
+                        ", Avg Intensity: " + averageIntensity,
+                Toast.LENGTH_LONG).show();
     }
+
+
+//    private void processAndDisplayImage(String a) {
+//        // Load the image from res/drawable
+//        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.test_image);
+//        Mat image = new Mat();
+//        Utils.bitmapToMat(bmp, image);
+//
+//        // Rotate the image by 180 degrees
+//        Core.rotate(image, image, Core.ROTATE_180);
+//
+//        int rows = image.rows();
+//        int cols = image.cols();
+//
+//        // Create a circular mask
+//        int center_x = 1720;
+//        int center_y = 1280;
+//        int radius = 1000;
+//        Mat mask = new Mat(rows, cols, CvType.CV_8U, new Scalar(0));
+//        Imgproc.circle(mask, new Point(center_x, center_y), radius, new Scalar(255), -1);
+//
+//        // Apply the mask to the image
+//        Mat maskedImage = new Mat();
+//        Core.bitwise_and(image, image, maskedImage, mask);
+//
+//        // Extract the green channel
+//        List<Mat> channels = new ArrayList<>();
+//        Core.split(maskedImage, channels);
+//        Mat greenChannel = channels.get(1);
+//
+//        // Threshold the green channel
+//        int threshold = 110;
+//        Mat binaryMask = new Mat();
+//        Core.inRange(greenChannel, new Scalar(1), new Scalar(threshold), binaryMask);
+//
+//        // Calculate statistics
+//        double totalIntensity = Core.sumElems(greenChannel).val[0];
+//        int numPixels = Core.countNonZero(binaryMask);
+//        double averageIntensity = totalIntensity / numPixels;
+//
+//        // Merge the channels to get the RGB result
+//        Mat maskedOriginalImageRGB = new Mat();
+//        Core.merge(channels, maskedOriginalImageRGB);
+//
+//        // Convert the processed Mat back to Bitmap for displaying
+//        Bitmap processedBitmap = Bitmap.createBitmap(maskedOriginalImageRGB.cols(), maskedOriginalImageRGB.rows(), Bitmap.Config.ARGB_8888);
+//        Utils.matToBitmap(maskedOriginalImageRGB, processedBitmap);
+//        fl_image_view.setImageBitmap(processedBitmap);
+//
+//        // Display the statistics
+//        Toast.makeText(requireContext(),
+//                "Total Intensity: " + totalIntensity +
+//                        ", Num Pixels: " + numPixels +
+//                        ", Avg Intensity: " + averageIntensity,
+//                Toast.LENGTH_LONG).show();
+//    }
+
 }

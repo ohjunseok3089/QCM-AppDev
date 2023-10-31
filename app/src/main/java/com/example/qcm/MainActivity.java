@@ -197,11 +197,11 @@ public class MainActivity extends AppCompatActivity {
             Log.d(LOGTAG_OPENCV, "OpenCV failed to load!");
         }
 
-        try {
-            receiveDataTest(); // TODO - Make sure to delete this line in production
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//        try {
+//            receiveDataTest(); // TODO - Make sure to delete this line in production
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
 
     }
 
@@ -284,8 +284,8 @@ public class MainActivity extends AppCompatActivity {
                 while (!Thread.currentThread().isInterrupted()) {
                     try {
                         // Generate random data
-                        double randomFrequency = 50 + (150-50) * random.nextDouble();  // random value between 50 to 150
-                        double randomTemperature = 270 + (370-270) * random.nextDouble(); // random value between 270 to 370
+                        int randomFrequency = 50 + random.nextInt(101);  // random integer between 50 to 150 inclusive
+                        int randomTemperature = 270 + random.nextInt(101); // random integer between 270 to 370 inclusive
 
                         final String text = randomFrequency + "," + randomTemperature;
                         handler.post(new Runnable() {

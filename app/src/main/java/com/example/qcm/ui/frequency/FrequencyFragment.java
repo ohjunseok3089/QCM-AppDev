@@ -63,7 +63,7 @@ public class FrequencyFragment extends Fragment {
 
     private Thread workerThread = null;                 // To receive a String
     private String fileName;
-
+    private boolean isUserScrolled = false;
 
     @SuppressLint({"SetTextI18n", "ClickableViewAccessibility"})
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -126,6 +126,15 @@ public class FrequencyFragment extends Fragment {
         graph.getGridLabelRenderer().setVerticalAxisTitle("Frequency (Hz)");
         graph.getGridLabelRenderer().setHorizontalAxisTitle("Time (s)");
         graph.setTitle("Frequency (Hz) / Time (s)");
+        graph.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                if (scrollX != oldScrollX) {
+                    isUserScrolled = true;
+                }
+            }
+        });
+
         graph.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -171,7 +180,16 @@ public class FrequencyFragment extends Fragment {
                 TextView rdata_temp = rootView.findViewById(R.id.rt_temp_freq);
                 rdata_freq.setText(array[0] + "Hz");
                 rdata_temp.setText(array[1] + "K");
-                viewportFrequency.setMaxX(((MainActivity)getActivity()).getDataSize());
+                int dataSize = ((MainActivity)getActivity()).getDataSize();
+                if (!isUserScrolled) {
+                    if (dataSize > 200) {
+                        viewportFrequency.setMinX(dataSize - 200);
+                        viewportFrequency.setMaxX(dataSize);
+                    } else {
+                        viewportFrequency.setMinX(0);
+                        viewportFrequency.setMaxX(dataSize);
+                    }
+                }
             } else {
                 Log.d("HomeFragment", "LiveData observed. Data format unexpected.");
             }
