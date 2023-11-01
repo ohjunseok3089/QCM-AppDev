@@ -123,7 +123,7 @@
         "rootBuildGradleFolder": "/Users/june/Documents/GitHub/QCM/QCM-AppDev",
         "sdkFolder": "/Users/june/Library/Android/sdk",
         "isBuildOnlyTargetAbiEnabled": true,
-        "ideBuildTargetAbi": "arm64-v8a",
+        "ideBuildTargetAbi": "arm64-v8a,armeabi-v7a,armeabi",
         "isCmakeBuildCohabitationEnabled": false,
         "isPrefabEnabled": false
       },

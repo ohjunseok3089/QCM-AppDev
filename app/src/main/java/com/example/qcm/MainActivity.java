@@ -140,9 +140,10 @@ public class MainActivity extends AppCompatActivity {
     private int batchCounter = 0;
     private final Executor backgroundExecutor = Executors.newSingleThreadExecutor();
     private final Handler mainThreadHandler = new Handler(Looper.getMainLooper());
-    public static Bitmap originalImage;
-    public static Bitmap processedImage;
-    public static String processedAnalysis;
+    private Bitmap originalImage;
+    private Bitmap processedImage;
+    private String processedAnalysis;
+    private String imageFilePath;
 
 
 
@@ -172,6 +173,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
 
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
@@ -437,6 +439,34 @@ public class MainActivity extends AppCompatActivity {
         return dataPointSeriesTemp;
     }
     public int getDataSize() {return pointsPlotted;}
+    public Bitmap getOriginalImage() {
+        return originalImage;
+    }
+
+    public Bitmap getProcessedImage() {
+        return processedImage;
+    }
+
+    public String getProcessedAnalysis() {
+        return processedAnalysis;
+    }
+
+    public String getImageFilePath() {
+        return imageFilePath;
+    }
+
+    public void setOriginalImage(Bitmap value) {
+        originalImage = value;
+    }
+    public void setProcessedImage(Bitmap value) {
+        processedImage = value;
+    }
+    public void setProcessedAnalysis(String value) {
+        processedAnalysis = value;
+    }
+    public void setImageFilePath(String value) {
+        imageFilePath = value;
+    }
 
 
     public void setCurExcelFile(File current){
@@ -688,4 +718,5 @@ public class MainActivity extends AppCompatActivity {
     private void showToast(String msg) {
         Toast.makeText(getApplicationContext(), msg, duration).show();
     }
+
 }
