@@ -76,7 +76,7 @@ public class FrequencyFragment extends Fragment {
         boolean isBluetoothConnected = ((MainActivity) getActivity()).checkBluetooth();
 
         // Check Bluetooth
-        if (isBluetoothConnected) {
+        if (!isBluetoothConnected) {
             // If it's not connected, then alert that you have to connect it to bluetooth.
             AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
             builder.setTitle("Bluetooth is not connected.");

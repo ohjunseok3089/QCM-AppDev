@@ -15,6 +15,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -139,6 +140,12 @@ public class MainActivity extends AppCompatActivity {
     private int batchCounter = 0;
     private final Executor backgroundExecutor = Executors.newSingleThreadExecutor();
     private final Handler mainThreadHandler = new Handler(Looper.getMainLooper());
+    public static Bitmap originalImage;
+    public static Bitmap processedImage;
+    public static String processedAnalysis;
+
+
+
 
     public interface OnDataFetchedListener {
         void onDataFetched(double[] array);
@@ -373,11 +380,10 @@ public class MainActivity extends AppCompatActivity {
 
                                             dataTemp = new DataPoint(pointsPlotted, Double.parseDouble(array[1]));
                                             freqTemp[1] = Double.parseDouble(array[1]);
-                                            fetchData();
                                             seriesTemp.appendData(dataTemp, true, pointsPlotted);
                                             dataPointSeriesFrequency.add(dataFreq);
-                                            dataPointSeriesTemp.add(dataFreq);
-                                            // TODO - Make a method
+                                            dataPointSeriesTemp.add(dataFreq);  // This should probably be dataTemp based on context, but keeping it as in original code
+                                            fetchData();
                                             batchCounter++;
                                             pointsPlotted++;
                                             time_counter++;
@@ -385,7 +391,7 @@ public class MainActivity extends AppCompatActivity {
                                                 try {
                                                     File tempFile = new File(getExternalFilesDir("experiments"), "_temp_.xlsx");
                                                     saveExcelFile(tempFile);
-                                                    batchCounter= 0;
+                                                    batchCounter = 0;
                                                 } catch (IOException e) {
                                                     e.printStackTrace();
                                                 }
@@ -401,10 +407,9 @@ public class MainActivity extends AppCompatActivity {
                                 } else {
                                     readBuffer[readBufferPosition++] = curByte;
                                 }
-
                             }
                         }
-                    } catch (IOException e){
+                    } catch (IOException e) {
                         e.printStackTrace();
                     }
                     try {
@@ -417,6 +422,7 @@ public class MainActivity extends AppCompatActivity {
         });
         workerThread.start();
     }
+
 
     public LineGraphSeries<DataPoint> getSeriesFrequency() {
         return seriesFrequency;

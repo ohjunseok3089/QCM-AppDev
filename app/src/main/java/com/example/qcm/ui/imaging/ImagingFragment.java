@@ -8,8 +8,10 @@ import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -25,6 +27,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
@@ -67,6 +70,7 @@ public class ImagingFragment extends Fragment {
     private ImageView fl_image_view;
     private ImageView fl_image_view_2;
     private TextView process_textview;
+    private Button makeChangeButton;
 
 
     @SuppressLint("QueryPermissionsNeeded")
@@ -94,6 +98,21 @@ public class ImagingFragment extends Fragment {
             return rootView;
         }
 
+//        processAndDisplayImage(imageFilePath);
+
+        // Retrieve the images from MainActivity and set them to ImageViews
+        if (MainActivity.originalImage != null) {
+            int sizeInPx = dpToPx(300, getResources());
+            Bitmap resizedBitmap = resizeBitmap(MainActivity.originalImage, sizeInPx, sizeInPx);
+            fl_image_view.setImageBitmap(resizedBitmap);
+        }
+        if (MainActivity.processedImage != null) {
+            int sizeInPx = dpToPx(300, getResources());
+            Bitmap resizedBitmap = resizeBitmap(MainActivity.processedImage, sizeInPx, sizeInPx);
+            fl_image_view.setImageBitmap(resizedBitmap);
+            process_textview.setText(MainActivity.processedAnalysis);
+        }
+
         img_folder = new File(requireContext().getExternalFilesDir("fl_images"), image_name);
         img_location = img_folder.getAbsolutePath();
         cameraBtn = rootView.findViewById(R.id.capture_image);
@@ -101,18 +120,22 @@ public class ImagingFragment extends Fragment {
         fl_image_view = rootView.findViewById(R.id.fl_image_view);
         fl_image_view_2 = rootView.findViewById(R.id.fl_image_view_post_process);
         process_textview = rootView.findViewById(R.id.process_result);
+        makeChangeButton = rootView.findViewById(R.id.make_change_button);
 
         cameraBtn.setOnClickListener(v -> {
             requestCameraPermission();
         });
 
+        makeChangeButton.setOnClickListener(v -> {
+            processAndDisplayImage(imageFilePath);
+        });
 
         return rootView;
     }
 
     private void openCamera() {
         Log.d("openCamera", "Method called");
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE_SECURE);
         try {
             File photoFile = createImageFile();
             if (photoFile != null) {
@@ -131,14 +154,32 @@ public class ImagingFragment extends Fragment {
         }
     }
 
+    int dpToPx(int dp, Resources resources) {
+        float scale = resources.getDisplayMetrics().density;
+        return (int) (dp * scale + 0.5f);
+    }
+    Bitmap resizeBitmap(Bitmap original, int newWidth, int newHeight) {
+        return Bitmap.createScaledBitmap(original, newWidth, newHeight, true);
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             promptForFileNameAndRename();
+
             Bitmap myBitmap = BitmapFactory.decodeFile(imageFilePath);
-            fl_image_view.setImageBitmap(myBitmap);
+            Matrix matrix = new Matrix();
+            matrix.postRotate(180);
+            Bitmap rotatedBitmap = Bitmap.createBitmap(myBitmap, 0, 0, myBitmap.getWidth(), myBitmap.getHeight(), matrix, true);
+            MainActivity.originalImage = rotatedBitmap;
+            int sizeInPx = dpToPx(300, getResources());
+
+            Bitmap resizedRotatedBitmap = resizeBitmap(rotatedBitmap, sizeInPx, sizeInPx);
+
+            fl_image_view.setImageBitmap(resizedRotatedBitmap);
+
+//            fl_image_view.setImageBitmap(myBitmap);
         }
     }
 
@@ -245,62 +286,6 @@ public class ImagingFragment extends Fragment {
         }
     }
 
-
-//    private void processAndDisplayImage(String imagePath) {
-//        Mat image = Imgcodecs.imread(imagePath);
-////        Core.rotate(image, image, Core.ROTATE_180);
-//// Convert drawable resource to bitmap
-//        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.test_image);
-//
-//        // Convert bitmap to Mat
-//        Mat image = new Mat(bmp.getHeight(), bmp.getWidth(), CvType.CV_8UC3);
-//        Utils.bitmapToMat(bmp, image);
-//
-//        int rows = image.rows();
-//        int cols = image.cols();
-//
-//        int center_x = 1720;
-//        int center_y = 1280;
-//        int radius = 1000;
-//
-//        Mat mask = new Mat(rows, cols, CvType.CV_8U, new Scalar(0));
-//        Imgproc.circle(mask, new Point(center_x, center_y), radius, new Scalar(255), -1);
-//
-//        List<Mat> channels = new ArrayList<>();
-//        Core.split(image, channels);
-//        for (Mat channel : channels) {
-//            Core.bitwise_and(channel, mask, channel);
-//        }
-//
-//        Mat greenChannel = channels.get(1);
-//
-//        int threshold = 110;
-//        Mat binaryMask = new Mat();
-//        Core.inRange(greenChannel, new Scalar(1), new Scalar(threshold), binaryMask);
-//
-//        double totalIntensity = Core.sumElems(greenChannel).val[0];
-//        int numPixels = Core.countNonZero(binaryMask);
-//        double averageIntensity = totalIntensity / numPixels;
-//
-//        Mat maskedOriginalImageRGB = new Mat();
-//        Core.merge(channels, maskedOriginalImageRGB);
-//
-//        // Save the processed image
-//        String processedImagePath = imagePath.replace(".jpg", "_processed.jpg");
-//        Imgcodecs.imwrite(processedImagePath, maskedOriginalImageRGB);
-//
-//        // Convert the saved image to a Bitmap
-//        bmp = BitmapFactory.decodeFile(processedImagePath);
-//        fl_image_view.setImageBitmap(bmp);
-//
-//        // Display the statistics (you can adjust this as needed)
-//        Toast.makeText(requireContext(),
-//                "Total Intensity: " + totalIntensity +
-//                        ", Num Pixels: " + numPixels +
-//                        ", Avg Intensity: " + averageIntensity,
-//                Toast.LENGTH_LONG).show();
-//    }
-
     @SuppressLint("SetTextI18n")
     private void processAndDisplayImage(String imagePath) {
         Mat image = Imgcodecs.imread(imagePath);
@@ -308,10 +293,19 @@ public class ImagingFragment extends Fragment {
         int rows = image.rows();
         int cols = image.cols();
 
-        int center_x = 1720;
-        int center_y = 1280;
         int radius = 1000; // Fixed
-        int threshold = 110;
+
+        String center_x_str = ((EditText) rootView.findViewById(R.id.center_x_input)).getText().toString();
+        String center_y_str = ((EditText) rootView.findViewById(R.id.center_y_input)).getText().toString();
+        String threshold_str = ((EditText) rootView.findViewById(R.id.threshold_input)).getText().toString();
+
+        int center_x = center_x_str.isEmpty() ? 1720 : Integer.parseInt(center_x_str);
+        int center_y = center_y_str.isEmpty() ? 1280 : Integer.parseInt(center_y_str);
+        int threshold = threshold_str.isEmpty() ? 110 : Integer.parseInt(threshold_str);
+
+        if (center_x == 0) center_x = 1720;
+        if (center_y == 0) center_y = 1280;
+        if (threshold == 0) threshold = 110;
 
         Mat mask = new Mat(rows, cols, CvType.CV_8U, new Scalar(0));
         Imgproc.circle(mask, new Point(center_x, center_y), radius, new Scalar(255), -1);
@@ -340,7 +334,16 @@ public class ImagingFragment extends Fragment {
 
         // Convert the saved image to a Bitmap
         Bitmap bmp = BitmapFactory.decodeFile(processedImagePath);
-        fl_image_view_2.setImageBitmap(bmp);
+        int sizeInPx = dpToPx(300, getResources());
+
+        Bitmap resizedRotatedBitmap = resizeBitmap(bmp, sizeInPx, sizeInPx);
+
+
+        fl_image_view_2.setImageBitmap(resizedRotatedBitmap);
+        MainActivity.processedImage = bmp;
+        MainActivity.processedAnalysis = "Total Intensity: " + totalIntensity +
+                ", Num Pixels: " + numPixels +
+                ", Avg Intensity: " + averageIntensity;
 
         process_textview.setText("Total Intensity: " + totalIntensity +
                 ", Num Pixels: " + numPixels +
@@ -353,61 +356,4 @@ public class ImagingFragment extends Fragment {
                         ", Avg Intensity: " + averageIntensity,
                 Toast.LENGTH_LONG).show();
     }
-
-
-//    private void processAndDisplayImage(String a) {
-//        // Load the image from res/drawable
-//        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.test_image);
-//        Mat image = new Mat();
-//        Utils.bitmapToMat(bmp, image);
-//
-//        // Rotate the image by 180 degrees
-//        Core.rotate(image, image, Core.ROTATE_180);
-//
-//        int rows = image.rows();
-//        int cols = image.cols();
-//
-//        // Create a circular mask
-//        int center_x = 1720;
-//        int center_y = 1280;
-//        int radius = 1000;
-//        Mat mask = new Mat(rows, cols, CvType.CV_8U, new Scalar(0));
-//        Imgproc.circle(mask, new Point(center_x, center_y), radius, new Scalar(255), -1);
-//
-//        // Apply the mask to the image
-//        Mat maskedImage = new Mat();
-//        Core.bitwise_and(image, image, maskedImage, mask);
-//
-//        // Extract the green channel
-//        List<Mat> channels = new ArrayList<>();
-//        Core.split(maskedImage, channels);
-//        Mat greenChannel = channels.get(1);
-//
-//        // Threshold the green channel
-//        int threshold = 110;
-//        Mat binaryMask = new Mat();
-//        Core.inRange(greenChannel, new Scalar(1), new Scalar(threshold), binaryMask);
-//
-//        // Calculate statistics
-//        double totalIntensity = Core.sumElems(greenChannel).val[0];
-//        int numPixels = Core.countNonZero(binaryMask);
-//        double averageIntensity = totalIntensity / numPixels;
-//
-//        // Merge the channels to get the RGB result
-//        Mat maskedOriginalImageRGB = new Mat();
-//        Core.merge(channels, maskedOriginalImageRGB);
-//
-//        // Convert the processed Mat back to Bitmap for displaying
-//        Bitmap processedBitmap = Bitmap.createBitmap(maskedOriginalImageRGB.cols(), maskedOriginalImageRGB.rows(), Bitmap.Config.ARGB_8888);
-//        Utils.matToBitmap(maskedOriginalImageRGB, processedBitmap);
-//        fl_image_view.setImageBitmap(processedBitmap);
-//
-//        // Display the statistics
-//        Toast.makeText(requireContext(),
-//                "Total Intensity: " + totalIntensity +
-//                        ", Num Pixels: " + numPixels +
-//                        ", Avg Intensity: " + averageIntensity,
-//                Toast.LENGTH_LONG).show();
-//    }
-
 }

@@ -190,7 +190,7 @@ public class HomeFragment extends Fragment {
 
         // Observe the LiveData and update UI
         homeViewModel.getData().observe(getViewLifecycleOwner(), array -> {
-            if (array != null && array.length == 2) {
+            if (array != null && array.length == 2 && array[0] != 0) {
                 TextView rdata = root.findViewById(R.id.receive_data_home);  // Adjust ID as necessary
                 rdata.setText("Frequency: " + array[0] + "Hz | Temperature: " + array[1] + "K");
             } else {
