@@ -26,7 +26,7 @@
             android:id="@+id/capture_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Capture Image"
+            android:text="Capture Image\n(Before Image)"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.1"
@@ -35,16 +35,16 @@
             app:layout_constraintVertical_bias="0.29000002" />
 
         <Button
-            android:id="@+id/view_image_button"
+            android:id="@+id/capture_image_2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="View FL Images"
+            android:text="Capture Image\n(After Image)"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.9"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/make_change_button"
-            app:layout_constraintVertical_bias="0.26999998" />
+            app:layout_constraintVertical_bias="0.29000002" />
 
         <TextView
             android:id="@+id/image_captured_view"
@@ -60,6 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Please capture an image for an analysis."
+            android:textAlignment="center"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.51"
@@ -71,6 +72,7 @@
             android:id="@+id/fl_image_view_post_process"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
             android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -120,11 +122,50 @@
             android:id="@+id/make_change_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Make Changes"
+            android:text="Image Processing"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/center_y_input"
             app:layout_constraintVertical_bias="0.19999999" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="75dp"
+            android:layout_height="20dp"
+            android:text="Center X"
+            android:textAlignment="center"
+            app:layout_constraintBottom_toTopOf="@+id/center_x_input"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.15"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/process_result"
+            app:layout_constraintVertical_bias="1.0" />
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="76dp"
+            android:layout_height="19dp"
+            android:text="Center Y"
+            android:textAlignment="center"
+            app:layout_constraintBottom_toTopOf="@+id/center_y_input"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/process_result"
+            app:layout_constraintVertical_bias="1.0" />
+
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="88dp"
+            android:layout_height="19dp"
+            android:text="Threshold"
+            android:textAlignment="center"
+            app:layout_constraintBottom_toTopOf="@+id/threshold_input"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.85"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/process_result"
+            app:layout_constraintVertical_bias="1.0" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

@@ -715,7 +715,7 @@ public class MainActivity extends AppCompatActivity {
         return bluetoothAdapter.getBondedDevices();
     }
 
-    private void showToast(String msg) {
+    public void showToast(String msg) {
         Toast.makeText(getApplicationContext(), msg, duration).show();
     }
 

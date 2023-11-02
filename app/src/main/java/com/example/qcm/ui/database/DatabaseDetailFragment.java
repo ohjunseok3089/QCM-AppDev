@@ -1,5 +1,6 @@
 package com.example.qcm.ui.database;
 
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
@@ -23,7 +24,10 @@ import com.example.qcm.R;
 import com.example.qcm.databinding.FragmentDashboardBinding;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.DataPointInterface;
 import com.jjoe64.graphview.series.LineGraphSeries;
+import com.jjoe64.graphview.series.OnDataPointTapListener;
+import com.jjoe64.graphview.series.Series;
 
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -40,9 +44,11 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.w3c.dom.Text;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -50,6 +56,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 public class DatabaseDetailFragment extends Fragment {
@@ -58,8 +65,15 @@ public class DatabaseDetailFragment extends Fragment {
     private int totalPoints = 0;
     private double avgFreq;
     private double avgTemp;
+    private int pointAIdx;
+    private int pointBIdx;
+    private int pointA = 0;
+    private int pointB = 0;
     ViewGroup rootView;
-
+    private TextView freq_avg_text;
+    private TextView fluo_result_text;
+    private TextView concentration_result;
+    private List<int[]> points;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -70,6 +84,10 @@ public class DatabaseDetailFragment extends Fragment {
         GraphView graph = (GraphView) rootView.findViewById(R.id.detail_graph);
         LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>();
         graph.addSeries(series);
+
+        freq_avg_text = rootView.findViewById(R.id.freq_results);
+        fluo_result_text = rootView.findViewById(R.id.fluo_result);
+        concentration_result = rootView.findViewById(R.id.concentration_result);
 
         // Set manual X bounds
         graph.getViewport().setXAxisBoundsManual(true);
@@ -90,20 +108,103 @@ public class DatabaseDetailFragment extends Fragment {
             dataTitle.setText(fileName.replace(".xlsx", ""));
             loadPoints(fileName, series);
 
-            double freq_avg = Math.round(avgFreq * 100.0) / 100.0;
-            double temp_avg = Math.round(avgTemp * 100.0) / 100.0;
-            TextView freq_avg_text = rootView.findViewById(R.id.avg_freq_text);
-//            TextView temp_avg_text = rootView.findViewById(R.id.avg_temp_text);
-            freq_avg_text.setText(freq_avg + " Hz");
-//            temp_avg_text.setText(temp_avg + "  K");
+
+            series.setOnDataPointTapListener(new OnDataPointTapListener() {
+                @SuppressLint("SetTextI18n")
+                @Override
+                public void onTap(Series series, DataPointInterface dataPoint) {
+                    int index = (int) dataPoint.getX();
+
+                    // Ensure there are at least three data points following the selected point
+                    try {
+                        // Calculate the average for the next three points
+                        int sumFreq = 0;
+                        for (int i = index; i <= index + 59; i++) {
+                            sumFreq += points.get(i)[1]; // assuming 1 is the index for frequency
+                        }
+                        int avgFreq = sumFreq / 60;
+
+                        // Assign to pointA or pointB
+                        if (pointA == 0 || (pointA > 0 && pointB > 0)) {
+                            pointB = 0;
+                            pointAIdx = index;
+                            pointA = avgFreq;
+                            freq_avg_text.setText("B - " + pointA + ": N/A Hz");
+//                            ((MainActivity)requireActivity()).showToast("" + pointAIdx);
+                            printResult(fileName);
+                        } else if (pointB == 0) {
+                            pointBIdx = index;
+                            pointB = avgFreq;
+                            int diffHz = pointB - pointA;
+                            freq_avg_text.setText(pointB + " - " + pointA + ": " + diffHz + " Hz");
+//                            ((MainActivity)requireActivity()).showToast("" + pointBIdx);
+                            printResult(fileName);
+                        }
+                    } catch (IndexOutOfBoundsException ignored) {
+                        ((MainActivity)requireActivity()).showToast("Please select different index!");
+                    }
+                }
+            });
+
             loadAndDisplayImages(rootView, fileName);
+            printResult(fileName);
+            // Load average intensity values from the analysis text files
+
         }
 
         return rootView;
     }
+    private void printResult(String fileName) {
+        double beforeAvgIntensity = loadAverageIntensityFromFile(getContext().getExternalFilesDir(null) + "/fl_images/" + fileName.replace(".xlsx", "") + "/before_FITC_analysis.txt");
+        double afterAvgIntensity = loadAverageIntensityFromFile(getContext().getExternalFilesDir(null) + "/fl_images/" + fileName.replace(".xlsx", "") + "/after_FITC_analysis.txt");
 
+        if (beforeAvgIntensity != 0) { // prevent division by zero
+            String concentration_result_text = "";
+
+            double ratio = afterAvgIntensity / beforeAvgIntensity;
+            fluo_result_text.setText("Ratio of Green Intensities: " + String.format(Locale.getDefault(), "%.2f", ratio));
+
+            double x, y;
+            concentration_result_text += "Based on Frequency : ";
+            if (pointA > 0 && pointB > 0) {
+                y = pointB - pointA;
+
+                double log10Y = Math.log10(Math.abs(y));
+                x = Math.pow(10, (log10Y - 0.955455) / 0.117809);
+                concentration_result_text += String.format(Locale.getDefault(), "%.2f CFU/mL\n", x);
+            } else {
+                concentration_result_text += "N/A\n";
+            }
+            y = ratio;
+            y = Math.log10(y);
+            x = Math.pow(10, (y + 0.021665) / 0.011376);
+            concentration_result_text += String.format(Locale.getDefault(), "Based on Fluorescence: %.2f CFU/mL", x);
+            concentration_result.setText(concentration_result_text);
+        } else {
+            fluo_result_text.setText("N/A");
+            concentration_result.setText("N/A");
+        }
+    }
+
+    private double loadAverageIntensityFromFile(String filePath) {
+        File file = new File(filePath);
+        if (file.exists()) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (line.startsWith("Avg Intensity: ")) {
+                        String value = line.replace("Avg Intensity: ", "").trim();
+                        return Double.parseDouble(value);
+                    }
+                }
+            } catch (IOException | NumberFormatException e) {
+                e.printStackTrace();
+            }
+        }
+        return 0; // Default value or consider throwing an exception
+    }
     private List<int[]> loadPoints(String fileName, LineGraphSeries<DataPoint> series) {
-        List<int[]> points = new ArrayList<int[]>();
+        points = new ArrayList<int[]>();
         String path = getContext().getExternalFilesDir(null) + "/experiments/" + fileName;
         File file = new File(path);
         try {
@@ -170,44 +271,23 @@ public class DatabaseDetailFragment extends Fragment {
 
     private void loadAndDisplayImages(View rootView, String fileName) {
         // Get the directory path
-        String path = getContext().getExternalFilesDir(null) + "/fl_images/" + fileName.replace(".xlsx", "") + "/";
-        File directory = new File(path);
+        String directoryPath = getContext().getExternalFilesDir(null) + "/fl_images/" + fileName.replace(".xlsx", "") + "/";
 
-        // Check if directory exists and is a directory
-        if (directory.exists() && directory.isDirectory()) {
-            File[] imageFiles = directory.listFiles();
+        // File names for "before" and "after" images
+        String beforeImagePath = directoryPath + "before_FITC_processed.jpg";
+        String afterImagePath = directoryPath + "after_FITC_processed.jpg";
 
-            // Sort the image files based on last modified time (ascending order)
-            Arrays.sort(imageFiles, new Comparator<File>() {
-                public int compare(File f1, File f2) {
-                    return Long.compare(f1.lastModified(), f2.lastModified());
-                }
-            });
+        // Get the ImageView references from the rootView
+        ImageView imageBefore = rootView.findViewById(R.id.image_left);
+        ImageView imageAfter = rootView.findViewById(R.id.image_right);
 
-            // Get the LinearLayout container from the rootView
-            LinearLayout imageContainer = rootView.findViewById(R.id.image_container);
+        // Load and set the "before" image
+        Bitmap bitmapBefore = BitmapFactory.decodeFile(beforeImagePath);
+        imageBefore.setImageBitmap(bitmapBefore);
 
-            // Loop through the sorted image files and populate the custom layout
-            for (int i = 0; i < imageFiles.length; i += 2) {
-                // Inflate the custom layout for two images
-                View imageRow = LayoutInflater.from(getContext()).inflate(R.layout.custom_image_row, null, false);
-
-                // Load the left image
-                ImageView imageLeft = imageRow.findViewById(R.id.image_left);
-                Bitmap bitmapLeft = BitmapFactory.decodeFile(imageFiles[i].getAbsolutePath());
-                imageLeft.setImageBitmap(bitmapLeft);
-
-                // Load the right image if available
-                if (i + 1 < imageFiles.length) {
-                    ImageView imageRight = imageRow.findViewById(R.id.image_right);
-                    Bitmap bitmapRight = BitmapFactory.decodeFile(imageFiles[i + 1].getAbsolutePath());
-                    imageRight.setImageBitmap(bitmapRight);
-                }
-
-                // Add the custom layout to the LinearLayout container
-                imageContainer.addView(imageRow);
-            }
-        }
+        // Load and set the "after" image
+        Bitmap bitmapAfter = BitmapFactory.decodeFile(afterImagePath);
+        imageAfter.setImageBitmap(bitmapAfter);
     }
 
 

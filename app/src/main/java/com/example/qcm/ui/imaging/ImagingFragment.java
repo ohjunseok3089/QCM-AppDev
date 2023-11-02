@@ -29,7 +29,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
@@ -50,13 +49,14 @@ import org.opencv.android.Utils;
 
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
+
 import android.util.DisplayMetrics;
 
 
@@ -76,6 +76,7 @@ public class ImagingFragment extends Fragment {
     private ImageView fl_image_view_2;
     private TextView process_textview;
     private Button makeChangeButton;
+    private int captureMode = 1;
 
 
     @SuppressLint({"QueryPermissionsNeeded", "ClickableViewAccessibility"})
@@ -113,7 +114,7 @@ public class ImagingFragment extends Fragment {
         img_folder = new File(requireContext().getExternalFilesDir("fl_images"), image_name);
         img_location = img_folder.getAbsolutePath();
         cameraBtn = rootView.findViewById(R.id.capture_image);
-        galleryBtn = rootView.findViewById(R.id.view_image_button);
+        galleryBtn = rootView.findViewById(R.id.capture_image_2);
         fl_image_view = rootView.findViewById(R.id.fl_image_view);
         fl_image_view_2 = rootView.findViewById(R.id.fl_image_view_post_process);
         process_textview = rootView.findViewById(R.id.process_result);
@@ -134,6 +135,7 @@ public class ImagingFragment extends Fragment {
             Bitmap resizedBitmap = resizeBitmap(((MainActivity) requireActivity()).getOriginalImage(), sizeInPx, sizeInPx);
             fl_image_view.setImageBitmap(resizedBitmap);
         }
+
         if (((MainActivity) requireActivity()).getProcessedImage() != null) {
             int screenWidthDp = getScreenWidthDp(getResources());
             int desiredWidthDp = 300;  // Default width
@@ -147,10 +149,17 @@ public class ImagingFragment extends Fragment {
             Bitmap resizedBitmap = resizeBitmap(((MainActivity) requireActivity()).getProcessedImage(), sizeInPx, sizeInPx);
             fl_image_view_2.setImageBitmap(resizedBitmap);
             process_textview.setText(((MainActivity) requireActivity()).getProcessedAnalysis());
-
         }
 
         cameraBtn.setOnClickListener(v -> {
+            captureMode = 1;
+            requestCameraPermission();
+            ((MainActivity) requireActivity()).setImageFilePath(imageFilePath);
+        });
+
+        // Naming of the btn is not correct.
+        galleryBtn.setOnClickListener(v -> {
+            captureMode = 2;
             requestCameraPermission();
             ((MainActivity) requireActivity()).setImageFilePath(imageFilePath);
         });
@@ -238,6 +247,7 @@ public class ImagingFragment extends Fragment {
         float scale = resources.getDisplayMetrics().density;
         return (int) (dp * scale + 0.5f);
     }
+
     Bitmap resizeBitmap(Bitmap original, int newWidth, int newHeight) {
         return Bitmap.createScaledBitmap(original, newWidth, newHeight, true);
     }
@@ -272,28 +282,34 @@ public class ImagingFragment extends Fragment {
     }
 
     private void promptForFileNameAndRename() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle("Enter Image Name");
-
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-        final EditText input = new EditText(requireContext());
-        input.setText(timeStamp);
-        builder.setView(input);
-
-        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String newFilename = input.getText().toString();
-                renameCapturedImage(newFilename);
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-        builder.show();
+        if (captureMode == 1) {
+            // Before mode
+            renameCapturedImage("before_FITC");
+        } else {
+            renameCapturedImage("after_FITC");
+        }
+//        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+//        builder.setTitle("Enter Image Name");
+//
+//        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+//        final EditText input = new EditText(requireContext());
+//        input.setText(timeStamp);
+//        builder.setView(input);
+//
+//        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                String newFilename = input.getText().toString();
+//                renameCapturedImage(newFilename);
+//            }
+//        });
+//        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                dialog.cancel();
+//            }
+//        });
+//        builder.show();
     }
 
     private void renameCapturedImage(String newFilename) {
@@ -306,7 +322,6 @@ public class ImagingFragment extends Fragment {
             Toast.makeText(requireContext(), "Failed to rename image", Toast.LENGTH_SHORT).show();
         }
         processAndDisplayImage(newFile.getAbsolutePath());
-
     }
 
     private File createImageFile() throws IOException {
@@ -413,7 +428,6 @@ public class ImagingFragment extends Fragment {
         Core.split(maskedImage, channels);
         Mat greenChannel = channels.get(1);
 
-
         Mat binaryMask = new Mat();
         Core.inRange(greenChannel, new Scalar(1), new Scalar(threshold), binaryMask);
 
@@ -424,17 +438,14 @@ public class ImagingFragment extends Fragment {
         int numPixels = Core.countNonZero(binaryMask);
         double averageIntensity = totalIntensity / numPixels;
 
-        // Save the processed image
         String processedImagePath = imagePath.replace(".jpg", "_processed.jpg");
         Imgcodecs.imwrite(processedImagePath, croppedImage);
 
-        // Convert the saved image to a Bitmap
         Bitmap bmp = BitmapFactory.decodeFile(processedImagePath);
 
         int screenWidthDp = getScreenWidthDp(getResources());
         int desiredWidthDp = 300;  // Default width
 
-// Check if the orientation is portrait
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             desiredWidthDp = screenWidthDp / 2; // 50% of the screen width
         }
@@ -445,13 +456,24 @@ public class ImagingFragment extends Fragment {
         fl_image_view_2.setImageBitmap(resizedRotatedBitmap);
 
         ((MainActivity) requireActivity()).setProcessedImage(bmp);
-        ((MainActivity) requireActivity()).setProcessedAnalysis("Total Intensity: " + formatNumber(totalIntensity) + "\n" +
-                "Num Pixels: " + formatNumber(numPixels) + "\n" +
-                "Avg Intensity: " + formatNumber(averageIntensity));
 
-        process_textview.setText("Total Intensity: " + formatNumber(totalIntensity) + "\n" +
-                "Num Pixels: " + formatNumber(numPixels) + "\n" +
-                "Avg Intensity: " + formatNumber(averageIntensity));
+        String analysisText = "Total Intensity: " + formatNumber(totalIntensity) + "\n" +
+                "Avg Intensity: " + formatNumber(averageIntensity);
+
+        String analysisFilePath = imagePath.replace(".jpg", "_analysis.txt");
+        try {
+            FileWriter writer = new FileWriter(analysisFilePath);
+            writer.write(analysisText);
+            writer.close();
+            // Notify the user or log that the file has been saved
+            Log.d("AnalysisData", "Analysis data saved to " + analysisFilePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+            // Handle the error, maybe notify the user that saving the analysis failed
+        }
+
+        ((MainActivity) requireActivity()).setProcessedAnalysis(analysisText);
+        process_textview.setText(analysisText);
 
         // Display the statistics (you can adjust this as needed)
     }
