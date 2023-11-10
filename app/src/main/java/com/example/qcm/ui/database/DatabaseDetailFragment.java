@@ -209,7 +209,6 @@ public class DatabaseDetailFragment extends Fragment {
         File file = new File(path);
         try {
             if (file.exists()){
-//                InputStream fis = new FileInputStream(file);
                 System.out.println(path);
                 Workbook workbook = WorkbookFactory.create(file);
                 Sheet sheet = workbook.getSheetAt(0);

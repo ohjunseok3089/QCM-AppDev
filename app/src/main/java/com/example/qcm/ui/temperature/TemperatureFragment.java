@@ -53,9 +53,6 @@ public class TemperatureFragment extends Fragment {
                 new ViewModelProvider(this).get(TemperatureViewModel.class);
         rootView = (ViewGroup) inflater.inflate(R.layout.fragment_temperature, container, false);
 
-//        TextView receiveDataTextView = getActivity().findViewById(R.id.receive_data);
-//        receiveDataTextView.setVisibility(View.VISIBLE);
-
         boolean isBluetoothConnected = ((MainActivity) getActivity()).checkBluetooth();
         if (!isBluetoothConnected) {
             // If it's not connected, then alert that you have to connect it to bluetooth.

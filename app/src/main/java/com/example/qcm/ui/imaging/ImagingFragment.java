@@ -106,7 +106,6 @@ public class ImagingFragment extends Fragment {
         if (savedInstanceState != null) {
             imageFilePath = savedInstanceState.getString("imageFilePath");
         }
-//        processAndDisplayImage(imageFilePath);
 
         // Retrieve the images from MainActivity and set them to ImageViews
 
@@ -266,7 +265,7 @@ public class ImagingFragment extends Fragment {
             int screenWidthDp = getScreenWidthDp(getResources());
             int desiredWidthDp = 300;  // Default width
 
-// Check if the orientation is portrait
+            // Check if the orientation is portrait
             if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
                 desiredWidthDp = screenWidthDp / 2; // 50% of the screen width
             }
@@ -275,9 +274,6 @@ public class ImagingFragment extends Fragment {
 
             Bitmap resizedRotatedBitmap = resizeBitmap(rotatedBitmap, sizeInPx, sizeInPx);
             fl_image_view.setImageBitmap(resizedRotatedBitmap);
-
-
-//            fl_image_view.setImageBitmap(myBitmap);
         }
     }
 
@@ -288,28 +284,6 @@ public class ImagingFragment extends Fragment {
         } else {
             renameCapturedImage("after_FITC");
         }
-//        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-//        builder.setTitle("Enter Image Name");
-//
-//        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-//        final EditText input = new EditText(requireContext());
-//        input.setText(timeStamp);
-//        builder.setView(input);
-//
-//        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                String newFilename = input.getText().toString();
-//                renameCapturedImage(newFilename);
-//            }
-//        });
-//        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                dialog.cancel();
-//            }
-//        });
-//        builder.show();
     }
 
     private void renameCapturedImage(String newFilename) {
@@ -474,8 +448,6 @@ public class ImagingFragment extends Fragment {
 
         ((MainActivity) requireActivity()).setProcessedAnalysis(analysisText);
         process_textview.setText(analysisText);
-
-        // Display the statistics (you can adjust this as needed)
     }
 
     private String formatNumber(double value) {

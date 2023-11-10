@@ -30,9 +30,6 @@ public class DatabaseFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-//        TextView receiveDataTextView = getActivity().findViewById(R.id.receive_data);
-//        receiveDataTextView.setVisibility(View.GONE);
-
         View rootView = inflater.inflate(R.layout.fragment_database, container, false);
         RecyclerView recyclerView = rootView.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -43,7 +40,6 @@ public class DatabaseFragment extends Fragment {
                 String fileName = item.getTitle() + ".xlsx";
                 File file = new File(getContext().getExternalFilesDir(null), "experiments/" + fileName);
                 if (file.exists()) {
-                    // TODO: Launch a new fragment to display the Excel file
                     System.out.println(fileName);
                     Bundle bundle = new Bundle();
                     bundle.putString("fileName", fileName);

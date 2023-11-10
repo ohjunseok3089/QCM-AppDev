@@ -54,7 +54,7 @@ public class DatabaseAdapter extends RecyclerView.Adapter<DatabaseAdapter.ViewHo
             toast.show();
         }
 
-        mItems = itemList;  // your implementation to retrieve the list of items to display
+        mItems = itemList;
     }
 
     public interface OnItemClickListener {
